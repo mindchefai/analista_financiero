@@ -1,8 +1,8 @@
-import Landing from './components/Landing'
+import BankAnalyzer from './components/BankAnalyzer'
 import './App.css'
 
 function App() {
-  return <Landing />
+  return <BankAnalyzer />
 }
 
 export default App
