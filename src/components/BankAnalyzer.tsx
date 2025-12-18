@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { 
   Upload, 
@@ -257,7 +258,6 @@ const BankAnalyzer: React.FC = () => {
   };
 
   const handleAutoCategorize = () => {
-    // Función premium - preparada para integración futura con ChatGPT
     alert('🔒 Función Premium\n\nLa auto-categorización inteligente con IA estará disponible próximamente. Esta función utilizará inteligencia artificial avanzada para categorizar tus transacciones de forma más precisa.');
   };
 
@@ -292,78 +292,78 @@ const BankAnalyzer: React.FC = () => {
     }
   };
 
-const stats = useMemo<Stats | null>(() => {
-  if (!validated) return null;
+  const stats = useMemo<Stats | null>(() => {
+    if (!validated) return null;
 
-  const relevantTransactions = transactions.filter(t => t.categoria !== 'no-aplica');
+    const relevantTransactions = transactions.filter(t => t.categoria !== 'no-aplica');
 
-  const ventas = relevantTransactions
-    .filter(t => t.categoria === 'venta')
-    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+    const ventas = relevantTransactions
+      .filter(t => t.categoria === 'venta')
+      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-  const gastosGenerales = relevantTransactions
-    .filter(t => t.categoria === 'gastos')
-    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+    const gastosGenerales = relevantTransactions
+      .filter(t => t.categoria === 'gastos')
+      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-  const personal = relevantTransactions
-    .filter(t => t.categoria === 'personal')
-    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+    const personal = relevantTransactions
+      .filter(t => t.categoria === 'personal')
+      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-  const materiaPrima = relevantTransactions
-    .filter(t => t.categoria === 'materia')
-    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+    const materiaPrima = relevantTransactions
+      .filter(t => t.categoria === 'materia')
+      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-  const otrosGastos = relevantTransactions
-    .filter(t => t.categoria === 'otros')
-    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+    const otrosGastos = relevantTransactions
+      .filter(t => t.categoria === 'otros')
+      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-  const totalCostes = gastosGenerales + personal + materiaPrima + otrosGastos;
-  const beneficio = ventas - totalCostes;
+    const totalCostes = gastosGenerales + personal + materiaPrima + otrosGastos;
+    const beneficio = ventas - totalCostes;
 
-  const gastosPercent = totalCostes > 0 ? (gastosGenerales / totalCostes) * 100 : 0;
-  const personalPercent = totalCostes > 0 ? (personal / totalCostes) * 100 : 0;
-  const materiaPercent = totalCostes > 0 ? (materiaPrima / totalCostes) * 100 : 0;
-  const otrosPercent = totalCostes > 0 ? (otrosGastos / totalCostes) * 100 : 0;
+    const gastosPercent = totalCostes > 0 ? (gastosGenerales / totalCostes) * 100 : 0;
+    const personalPercent = totalCostes > 0 ? (personal / totalCostes) * 100 : 0;
+    const materiaPercent = totalCostes > 0 ? (materiaPrima / totalCostes) * 100 : 0;
+    const otrosPercent = totalCostes > 0 ? (otrosGastos / totalCostes) * 100 : 0;
 
-  let gastosRounded = Math.round(gastosPercent);
-  let personalRounded = Math.round(personalPercent);
-  let materiaRounded = Math.round(materiaPercent);
-  let otrosRounded = Math.round(otrosPercent);
+    let gastosRounded = Math.round(gastosPercent);
+    let personalRounded = Math.round(personalPercent);
+    let materiaRounded = Math.round(materiaPercent);
+    let otrosRounded = Math.round(otrosPercent);
 
-  if (totalCostes > 0) {
-    const sum = gastosRounded + personalRounded + materiaRounded + otrosRounded;
-    if (sum !== 100) {
-      const diff = 100 - sum;
-      const max = Math.max(gastosPercent, personalPercent, materiaPercent, otrosPercent);
-      if (gastosPercent === max) {
-        gastosRounded += diff;
-      } else if (personalPercent === max) {
-        personalRounded += diff;
-      } else if (materiaPercent === max) {
-        materiaRounded += diff;
-      } else {
-        otrosRounded += diff;
+    if (totalCostes > 0) {
+      const sum = gastosRounded + personalRounded + materiaRounded + otrosRounded;
+      if (sum !== 100) {
+        const diff = 100 - sum;
+        const max = Math.max(gastosPercent, personalPercent, materiaPercent, otrosPercent);
+        if (gastosPercent === max) {
+          gastosRounded += diff;
+        } else if (personalPercent === max) {
+          personalRounded += diff;
+        } else if (materiaPercent === max) {
+          materiaRounded += diff;
+        } else {
+          otrosRounded += diff;
+        }
       }
     }
-  }
 
-  return {
-    ventas,
-    gastosGenerales,
-    personal,
-    materiaPrima,
-    otrosGastos,
-    totalCostes,
-    beneficio,
-    ratios: {
-      gastosVentas: gastosRounded,
-      personalVentas: personalRounded,
-      materiaVentas: materiaRounded,
-      otrosVentas: otrosRounded,
-      margen: ventas > 0 ? (beneficio / ventas * 100).toFixed(1) : '0.0'
-    }
-  };
-}, [transactions, validated]);
+    return {
+      ventas,
+      gastosGenerales,
+      personal,
+      materiaPrima,
+      otrosGastos,
+      totalCostes,
+      beneficio,
+      ratios: {
+        gastosVentas: gastosRounded,
+        personalVentas: personalRounded,
+        materiaVentas: materiaRounded,
+        otrosVentas: otrosRounded,
+        margen: ventas > 0 ? (beneficio / ventas * 100).toFixed(1) : '0.0'
+      }
+    };
+  }, [transactions, validated]);
 
   const dailySales = useMemo<DailySales[]>(() => {
     if (!validated) return [];
@@ -409,36 +409,40 @@ const stats = useMemo<Stats | null>(() => {
       <div 
         style={{ 
           border: '1px solid #e5e7eb',
-          padding: '0.875rem',
+          padding: 'clamp(0.625rem, 2vw, 0.875rem)',
           borderRadius: '0.5rem',
           backgroundColor: 'white',
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           transition: 'transform 0.2s ease',
-          position: 'relative'
+          position: 'relative',
+          minWidth: 0
         }}
         className="hover-lift"
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.375rem', gap: '0.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', minWidth: 0, flex: 1 }}>
             <h4 style={{ 
-              fontSize: '0.7rem', 
+              fontSize: 'clamp(0.625rem, 1.5vw, 0.7rem)', 
               fontWeight: 600, 
               textTransform: 'uppercase', 
               letterSpacing: '0.05em',
               color: '#6b7280',
-              margin: 0
+              margin: 0,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
             }}>
               {title}
             </h4>
             {tooltip && (
               <div 
-                style={{ position: 'relative', display: 'inline-flex' }}
+                style={{ position: 'relative', display: 'inline-flex', flexShrink: 0 }}
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
               >
                 <svg 
-                  width="14" 
-                  height="14" 
+                  width="12" 
+                  height="12" 
                   viewBox="0 0 24 24" 
                   fill="none" 
                   stroke="#9ca3af" 
@@ -483,9 +487,10 @@ const stats = useMemo<Stats | null>(() => {
             )}
           </div>
           <div style={{ 
-            padding: '0.3rem', 
+            padding: '0.25rem', 
             borderRadius: '0.3rem',
-            backgroundColor: variant === 'success' ? '#dcfce7' : '#fee2e2'
+            backgroundColor: variant === 'success' ? '#dcfce7' : '#fee2e2',
+            flexShrink: 0
           }}>
             {React.cloneElement(icon as React.ReactElement, { 
               size: 14, 
@@ -494,10 +499,11 @@ const stats = useMemo<Stats | null>(() => {
           </div>
         </div>
         <p style={{ 
-          fontSize: '1.25rem', 
+          fontSize: 'clamp(1rem, 3vw, 1.25rem)', 
           fontWeight: 700,
           color: variant === 'success' ? '#059669' : '#dc2626',
-          margin: 0
+          margin: 0,
+          wordBreak: 'break-word'
         }}>
           {value}
         </p>
@@ -512,7 +518,7 @@ const stats = useMemo<Stats | null>(() => {
         <ContentWrapper>
           <div style={{ 
             background: 'linear-gradient(135deg, #203c42 0%, #2a4c53 100%)',
-            padding: '1.25rem 1.5rem'
+            padding: '1rem 1rem'
           }}>
             <LogoHeader />
           </div>
@@ -548,128 +554,119 @@ const stats = useMemo<Stats | null>(() => {
                   </>
                 ) : (
                   <div>
-<SectionHeader
-  title="Categoriza tus transacciones"
-  subtitle={`${categorizedCount} de ${transactions.length} categorizadas${autoCategorizedCount > 0 ? ` (${autoCategorizedCount} automáticas)` : ''}`}
->
-  <label 
-    style={{ 
-      padding: '0.625rem 1.25rem',
-      borderRadius: '0.5rem',
-      fontWeight: 500,
-      fontSize: '0.875rem',
-      backgroundColor: '#f9fafb',
-      color: '#374151',
-      border: '1px solid #e5e7eb',
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-      transition: 'all 0.2s ease',
-      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.backgroundColor = '#f3f4f6';
-      e.currentTarget.style.borderColor = '#d1d5db';
-      e.currentTarget.style.transform = 'translateY(-1px)';
-      e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.backgroundColor = '#f9fafb';
-      e.currentTarget.style.borderColor = '#e5e7eb';
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
-    }}
-  >
-    <Upload size={16} style={{ color: '#6b7280' }} />
-    Cambiar archivo
-    <input
-      type="file"
-      accept=".csv,.xlsx,.xls,.txt"
-      onChange={handleFileUpload}
-      style={{ display: 'none' }}
-    />
-  </label>
+                    <SectionHeader
+                      title="Categoriza tus transacciones"
+                      subtitle={`${categorizedCount} de ${transactions.length} categorizadas${autoCategorizedCount > 0 ? ` (${autoCategorizedCount} automáticas)` : ''}`}
+                    >
+                      <label 
+                        style={{ 
+                          padding: 'clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1.25rem)',
+                          borderRadius: '0.5rem',
+                          fontWeight: 500,
+                          fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+                          backgroundColor: '#f9fafb',
+                          color: '#374151',
+                          border: '1px solid #e5e7eb',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          transition: 'all 0.2s ease',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#f3f4f6';
+                          e.currentTarget.style.borderColor = '#d1d5db';
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#f9fafb';
+                          e.currentTarget.style.borderColor = '#e5e7eb';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                        }}
+                      >
+                        <Upload size={16} style={{ color: '#6b7280' }} />
+                        <span style={{ whiteSpace: 'nowrap' }}>Cambiar archivo</span>
+                        <input
+                          type="file"
+                          accept=".csv,.xlsx,.xls,.txt"
+                          onChange={handleFileUpload}
+                          style={{ display: 'none' }}
+                        />
+                      </label>
 
-  <button
-    onClick={handleAutoCategorize}
-    style={{
-      padding: '0.625rem 1.25rem',
-      borderRadius: '0.5rem',
-      fontWeight: 600,
-      fontSize: '0.875rem',
-      background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-      color: '#ffffff',
-      border: 'none',
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-      transition: 'all 0.3s ease',
-      boxShadow: '0 4px 12px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
-      position: 'relative',
-      overflow: 'hidden'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.boxShadow = '0 8px 20px rgba(251, 191, 36, 0.45), inset 0 1px 0 rgba(255,255,255,0.2)';
-      e.currentTarget.style.background = '#d97706';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)';
-      e.currentTarget.style.background = '#f59e0b';
-    }}
-  >
-    <Crown 
-      size={16} 
-      style={{ 
-        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
-        animation: 'pulse 2s ease-in-out infinite'
-      }} 
-    />
-    <span style={{ 
-      textShadow: '0 1px 2px rgba(0,0,0,0.1)',
-      letterSpacing: '0.015em'
-    }}>
-      Auto-categorizar
-    </span>
-  </button>
+                      <button
+                        onClick={handleAutoCategorize}
+                        style={{
+                          padding: 'clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1.25rem)',
+                          borderRadius: '0.5rem',
+                          fontWeight: 600,
+                          fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+                          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                          color: '#ffffff',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 4px 12px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 8px 20px rgba(251, 191, 36, 0.45), inset 0 1px 0 rgba(255,255,255,0.2)';
+                          e.currentTarget.style.background = '#d97706';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)';
+                          e.currentTarget.style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
+                        }}
+                      >
+                        <Crown size={16} style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' }} />
+                        <span style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)', letterSpacing: '0.015em', whiteSpace: 'nowrap' }}>
+                          Auto-categorizar
+                        </span>
+                      </button>
 
-  <button
-    onClick={handleValidate}
-    style={{
-      padding: '0.625rem 1.25rem',
-      borderRadius: '0.5rem',
-      fontWeight: 600,
-      fontSize: '0.875rem',
-      background: '#047857',
-      color: 'white',
-      border: 'none',
-      cursor: 'pointer',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-      transition: 'all 0.2s ease',
-      boxShadow: '0 2px 8px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255,255,255,0.15)'
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-1px)';
-      e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.35), inset 0 1px 0 rgba(255,255,255,0.15)';
-      e.currentTarget.style.background = '#065f46';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255,255,255,0.15)';
-      e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
-    }}
-  >
-    <Check size={16} />
-    Validar
-  </button>
-</SectionHeader>
+                      <button
+                        onClick={handleValidate}
+                        style={{
+                          padding: 'clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1.25rem)',
+                          borderRadius: '0.5rem',
+                          fontWeight: 600,
+                          fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+                          background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                          color: 'white',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          transition: 'all 0.2s ease',
+                          boxShadow: '0 2px 8px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255,255,255,0.15)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.35), inset 0 1px 0 rgba(255,255,255,0.15)';
+                          e.currentTarget.style.background = '#065f46';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255,255,255,0.15)';
+                          e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+                        }}
+                      >
+                        <Check size={16} />
+                        <span style={{ whiteSpace: 'nowrap' }}>Validar</span>
+                      </button>
+                    </SectionHeader>
 
-                    {autoCategorizedCount > 0 && (
+                  {autoCategorizedCount > 0 && (
                       <AutoCategorizeBanner count={autoCategorizedCount} />
                     )}
 
@@ -699,8 +696,8 @@ const stats = useMemo<Stats | null>(() => {
 
                 <div style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(4, 1fr)',
-                  gap: '0.875rem',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))',
+                  gap: '0.75rem',
                   marginBottom: '1.5rem'
                 }}>
                   <CompactKPI
@@ -735,7 +732,7 @@ const stats = useMemo<Stats | null>(() => {
 
                 <div style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
                   gap: '1.25rem'
                 }}>
                   <PieChart stats={stats} formatCurrency={formatCurrency} />

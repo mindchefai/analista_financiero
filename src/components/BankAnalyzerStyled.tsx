@@ -29,6 +29,12 @@ export const GlobalStyles: React.FC = () => (
     
     * {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
     }
     
     .hover-lift:hover {
@@ -44,17 +50,15 @@ export const GlobalStyles: React.FC = () => (
 
 // Contenedor principal
 export const Container: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', padding: '2rem' }}>
+  <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
     {children}
   </div>
 );
 
 // Wrapper del contenido
 export const ContentWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="max-w-7xl mx-auto">
-    <div className="bg-white rounded-lg overflow-hidden" style={{ boxShadow: '0 10px 25px rgba(32, 60, 66, 0.1)' }}>
-      {children}
-    </div>
+  <div style={{ backgroundColor: 'white', minHeight: '100vh' }}>
+    {children}
   </div>
 );
 
@@ -66,15 +70,35 @@ export const Header: React.FC<{ icon: React.ReactNode; title: string; subtitle: 
 }) => (
   <div style={{ 
     background: '#203c42',
-    padding: '2rem'
+    padding: '1.5rem 1rem'
   }}>
-    <div className="flex items-center gap-4 mb-2">
-      <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: '0.75rem', borderRadius: '0.5rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ 
+        backgroundColor: 'rgba(255,255,255,0.1)', 
+        padding: '0.75rem', 
+        borderRadius: '0.5rem',
+        flexShrink: 0
+      }}>
         {icon}
       </div>
-      <div>
-        <h1 className="text-3xl font-bold text-white">{title}</h1>
-        <p className="text-white mt-1" style={{ opacity: 0.8, fontWeight: 300 }}>
+      <div style={{ minWidth: 0 }}>
+        <h1 style={{ 
+          fontSize: 'clamp(1.25rem, 5vw, 1.875rem)',
+          fontWeight: 700,
+          color: 'white',
+          margin: 0,
+          lineHeight: 1.2
+        }}>
+          {title}
+        </h1>
+        <p style={{ 
+          color: 'white',
+          marginTop: '0.25rem',
+          opacity: 0.8,
+          fontWeight: 300,
+          fontSize: 'clamp(0.8rem, 3vw, 1rem)',
+          margin: '0.25rem 0 0 0'
+        }}>
           {subtitle}
         </p>
       </div>
@@ -84,7 +108,11 @@ export const Header: React.FC<{ icon: React.ReactNode; title: string; subtitle: 
 
 // Tabs Container
 export const TabsContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="flex border-b" style={{ borderColor: '#e5e7eb', backgroundColor: '#f9fafb' }}>
+  <div style={{ 
+    display: 'flex', 
+    borderBottom: '1px solid #e5e7eb', 
+    backgroundColor: '#f9fafb' 
+  }}>
     {children}
   </div>
 );
@@ -94,11 +122,17 @@ export const TabButton: React.FC<TabButtonProps> = ({ active, disabled, onClick,
   <button
     onClick={onClick}
     disabled={disabled}
-    className="flex-1 py-4 px-6 font-medium transition-all relative"
     style={{
+      flex: 1,
+      padding: 'clamp(0.75rem, 3vw, 1rem) clamp(0.5rem, 2vw, 1.5rem)',
+      fontWeight: 500,
+      transition: 'all 0.2s ease',
+      position: 'relative',
       color: active ? '#203c42' : disabled ? '#d1d5db' : '#6b7280',
       backgroundColor: active ? 'white' : 'transparent',
-      cursor: disabled ? 'not-allowed' : 'pointer'
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      border: 'none',
+      fontSize: 'clamp(0.8rem, 2.5vw, 1rem)'
     }}
   >
     {active && (
@@ -117,7 +151,7 @@ export const TabButton: React.FC<TabButtonProps> = ({ active, disabled, onClick,
 
 // Content Area
 export const ContentArea: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="p-8">{children}</div>
+  <div style={{ padding: 'clamp(1rem, 3vw, 2rem)' }}>{children}</div>
 );
 
 // Upload Area
@@ -127,26 +161,56 @@ export const UploadArea: React.FC<{
   description: string;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = ({ icon, title, description, onFileChange }) => (
-  <div className="text-center py-16">
-    <div className="mb-6 inline-block p-6 rounded-full" style={{ backgroundColor: '#f9fafb' }}>
+  <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+    <div style={{ 
+      marginBottom: '1.5rem', 
+      display: 'inline-block', 
+      padding: '1.5rem', 
+      borderRadius: '9999px',
+      backgroundColor: '#f9fafb' 
+    }}>
       {icon}
     </div>
-    <h3 className="text-2xl font-semibold mb-3" style={{ color: '#203c42' }}>
+    <h3 style={{ 
+      fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
+      fontWeight: 600,
+      marginBottom: '0.75rem',
+      color: '#203c42',
+      margin: '0 0 0.75rem 0'
+    }}>
       {title}
     </h3>
-    <p className="mb-8 max-w-md mx-auto" style={{ color: '#6b7280' }}>
+    <p style={{ 
+      marginBottom: '2rem',
+      maxWidth: '28rem',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      color: '#6b7280',
+      fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
+      margin: '0 auto 2rem auto',
+      padding: '0 1rem'
+    }}>
       {description}
     </p>
     <label 
-      className="inline-block text-white px-8 py-3 rounded-lg cursor-pointer font-medium hover-lift"
-      style={{ backgroundColor: '#203c42' }}
+      style={{ 
+        display: 'inline-block',
+        color: 'white',
+        padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem)',
+        borderRadius: '0.5rem',
+        cursor: 'pointer',
+        fontWeight: 500,
+        backgroundColor: '#203c42',
+        fontSize: 'clamp(0.875rem, 2.5vw, 1rem)',
+        transition: 'all 0.2s ease'
+      }}
     >
       Seleccionar archivo
       <input
         type="file"
         accept=".csv"
         onChange={onFileChange}
-        className="hidden"
+        style={{ display: 'none' }}
       />
     </label>
   </div>
@@ -158,16 +222,39 @@ export const SectionHeader: React.FC<{
   subtitle: string;
   children?: React.ReactNode;
 }> = ({ title, subtitle, children }) => (
-  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+  <div style={{ 
+    display: 'flex', 
+    flexDirection: 'column',
+    gap: '1rem',
+    marginBottom: '1.5rem'
+  }}>
     <div>
-      <h3 className="text-xl font-semibold mb-1" style={{ color: '#203c42' }}>
+      <h3 style={{ 
+        fontSize: 'clamp(1.125rem, 3vw, 1.25rem)',
+        fontWeight: 600,
+        marginBottom: '0.25rem',
+        margin: '0 0 0.25rem 0',
+        color: '#203c42'
+      }}>
         {title}
       </h3>
-      <p className="text-sm" style={{ color: '#6b7280' }}>
+      <p style={{ 
+        fontSize: 'clamp(0.8rem, 2vw, 0.875rem)',
+        color: '#6b7280',
+        margin: 0
+      }}>
         {subtitle}
       </p>
     </div>
-    {children && <div className="flex gap-3">{children}</div>}
+    {children && (
+      <div style={{ 
+        display: 'flex', 
+        flexWrap: 'wrap',
+        gap: '0.5rem'
+      }}>
+        {children}
+      </div>
+    )}
   </div>
 );
 
@@ -179,8 +266,20 @@ export const PrimaryButton: React.FC<{
 }> = ({ onClick, icon, children }) => (
   <button
     onClick={onClick}
-    className="text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2 text-sm hover-lift"
-    style={{ background: '#e5b45f' }}
+    style={{ 
+      color: 'white',
+      padding: 'clamp(0.5rem, 2vw, 0.625rem) clamp(1rem, 3vw, 1.5rem)',
+      borderRadius: '0.5rem',
+      fontWeight: 500,
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      fontSize: 'clamp(0.8rem, 2vw, 0.875rem)',
+      background: '#e5b45f',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease'
+    }}
   >
     {icon}
     {children}
@@ -193,37 +292,58 @@ export const SecondaryButton: React.FC<{
   children: React.ReactNode;
 }> = ({ onFileChange, children }) => (
   <label 
-    className="px-5 py-2.5 rounded-lg cursor-pointer font-medium text-sm transition-all"
-    style={{ backgroundColor: '#f3f4f6', color: '#374151' }}
+    style={{ 
+      padding: 'clamp(0.5rem, 2vw, 0.625rem) clamp(1rem, 3vw, 1.25rem)',
+      borderRadius: '0.5rem',
+      cursor: 'pointer',
+      fontWeight: 500,
+      fontSize: 'clamp(0.8rem, 2vw, 0.875rem)',
+      transition: 'all 0.2s ease',
+      backgroundColor: '#f3f4f6',
+      color: '#374151',
+      display: 'inline-block'
+    }}
   >
     {children}
     <input
       type="file"
       accept=".csv"
       onChange={onFileChange}
-      className="hidden"
+      style={{ display: 'none' }}
     />
   </label>
 );
 
 // Table Container
 export const TableContainer: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="overflow-x-auto border rounded-lg" style={{ borderColor: '#e5e7eb' }}>
-    <table className="w-full">{children}</table>
+  <div style={{ 
+    overflowX: 'auto',
+    border: '1px solid #e5e7eb',
+    borderRadius: '0.5rem',
+    WebkitOverflowScrolling: 'touch'
+  }}>
+    <table style={{ width: '100%', minWidth: '600px' }}>{children}</table>
   </div>
 );
 
 // Table Header
 export const TableHeader: React.FC<{ columns: string[] }> = ({ columns }) => (
   <thead>
-    <tr className="border-b" style={{ backgroundColor: '#f9fafb', borderColor: '#e5e7eb' }}>
+    <tr style={{ 
+      borderBottom: '1px solid #e5e7eb',
+      backgroundColor: '#f9fafb'
+    }}>
       {columns.map((col, idx) => (
         <th 
           key={idx}
-          className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider" 
           style={{ 
-            color: '#6b7280',
-            textAlign: idx === 2 ? 'right' : 'left'
+            padding: 'clamp(0.75rem, 2vw, 1rem)',
+            textAlign: idx === 2 ? 'right' : 'left',
+            fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: '#6b7280'
           }}
         >
           {col}
@@ -289,29 +409,52 @@ export const KPICard: React.FC<KPICardProps> = ({ title, value, icon, variant = 
 
   return (
     <div 
-      className="border p-6 rounded-lg hover-lift" 
       style={{ 
+        border: '1px solid',
+        padding: 'clamp(1rem, 3vw, 1.5rem)',
+        borderRadius: '0.5rem',
         backgroundColor: variant === 'default' || variant === 'success' ? 'white' : styles.cardBg,
         borderColor: styles.borderColor || '#e5e7eb',
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        background: variant === 'gradient' ? styles.cardBg : undefined
+        background: variant === 'gradient' ? styles.cardBg : undefined,
+        transition: 'all 0.2s ease'
       }}
     >
-      <div className="flex items-center justify-between mb-4">
+      <div style={{ 
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '1rem'
+      }}>
         <h4 
-          className="text-xs font-semibold uppercase tracking-wide" 
-          style={{ color: styles.titleColor || '#6b7280' }}
+          style={{ 
+            fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            color: styles.titleColor || '#6b7280',
+            margin: 0
+          }}
         >
           {title}
         </h4>
-        <div className="p-2 rounded-lg" style={{ backgroundColor: styles.bg }}>
+        <div style={{ 
+          padding: '0.5rem',
+          borderRadius: '0.5rem',
+          backgroundColor: styles.bg 
+        }}>
           {React.cloneElement(icon as React.ReactElement, { 
             size: 20, 
             style: { color: styles.iconColor } 
           })}
         </div>
       </div>
-      <p className="text-3xl font-bold" style={{ color: styles.textColor }}>
+      <p style={{ 
+        fontSize: 'clamp(1.5rem, 4vw, 1.875rem)',
+        fontWeight: 700,
+        color: styles.textColor,
+        margin: 0
+      }}>
         {value}
       </p>
     </div>
@@ -321,17 +464,49 @@ export const KPICard: React.FC<KPICardProps> = ({ title, value, icon, variant = 
 // Progress Bar
 export const ProgressBar: React.FC<ProgressBarProps> = ({ label, percentage, amount, color }) => (
   <div>
-    <div className="flex justify-between items-center mb-2">
-      <span className="font-medium" style={{ color: '#374151' }}>{label}</span>
-      <div className="text-right">
-        <span className="font-bold text-lg" style={{ color }}>{percentage}%</span>
-        <span className="text-sm ml-2" style={{ color: '#6b7280' }}>{amount}</span>
+    <div style={{ 
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: '0.5rem',
+      flexWrap: 'wrap',
+      gap: '0.5rem'
+    }}>
+      <span style={{ 
+        fontWeight: 500,
+        color: '#374151',
+        fontSize: 'clamp(0.875rem, 2vw, 1rem)'
+      }}>
+        {label}
+      </span>
+      <div style={{ textAlign: 'right' }}>
+        <span style={{ 
+          fontWeight: 700,
+          fontSize: 'clamp(1rem, 2.5vw, 1.125rem)',
+          color 
+        }}>
+          {percentage}%
+        </span>
+        <span style={{ 
+          fontSize: 'clamp(0.8rem, 2vw, 0.875rem)',
+          marginLeft: '0.5rem',
+          color: '#6b7280' 
+        }}>
+          {amount}
+        </span>
       </div>
     </div>
-    <div className="w-full rounded-full h-2 overflow-hidden" style={{ backgroundColor: '#e5e7eb' }}>
+    <div style={{ 
+      width: '100%',
+      borderRadius: '9999px',
+      height: '0.5rem',
+      overflow: 'hidden',
+      backgroundColor: '#e5e7eb' 
+    }}>
       <div
-        className="h-2 rounded-full"
         style={{ 
+          height: '0.5rem',
+          borderRadius: '9999px',
           width: `${Math.min(parseFloat(percentage), 100)}%`,
           backgroundColor: color,
           background: color.includes('gradient') ? color : undefined,
@@ -344,9 +519,29 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ label, percentage, amo
 
 // Cost Structure Card
 export const CostStructureCard: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="border p-8 rounded-lg mb-8" style={{ backgroundColor: '#f9fafb', borderColor: '#e5e7eb' }}>
-    <h4 className="text-lg font-bold mb-6" style={{ color: '#203c42' }}>Estructura de Costes</h4>
-    <div className="space-y-6">{children}</div>
+  <div style={{ 
+    border: '1px solid #e5e7eb',
+    padding: 'clamp(1.5rem, 4vw, 2rem)',
+    borderRadius: '0.5rem',
+    marginBottom: '2rem',
+    backgroundColor: '#f9fafb'
+  }}>
+    <h4 style={{ 
+      fontSize: 'clamp(1rem, 3vw, 1.125rem)',
+      fontWeight: 700,
+      marginBottom: '1.5rem',
+      color: '#203c42',
+      margin: '0 0 1.5rem 0'
+    }}>
+      Estructura de Costes
+    </h4>
+    <div style={{ 
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '1.5rem'
+    }}>
+      {children}
+    </div>
   </div>
 );
 
@@ -354,17 +549,43 @@ export const CostStructureCard: React.FC<{ children: React.ReactNode }> = ({ chi
 export const ExecutiveSummaryCard: React.FC<{ 
   items: Array<{ label: string; value: string }> 
 }> = ({ items }) => (
-  <div className="p-8 rounded-lg text-white" style={{
+  <div style={{
+    padding: 'clamp(1.5rem, 4vw, 2rem)',
+    borderRadius: '0.5rem',
+    color: 'white',
     background: '#203c42'
   }}>
-    <h4 className="text-xl font-bold mb-6">Resumen Ejecutivo</h4>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <h4 style={{ 
+      fontSize: 'clamp(1.125rem, 3vw, 1.25rem)',
+      fontWeight: 700,
+      marginBottom: '1.5rem',
+      margin: '0 0 1.5rem 0'
+    }}>
+      Resumen Ejecutivo
+    </h4>
+    <div style={{ 
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+      gap: '2rem'
+    }}>
       {items.map((item, idx) => (
         <div key={idx}>
-          <p className="text-sm mb-2 font-medium" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          <p style={{ 
+            fontSize: 'clamp(0.8rem, 2vw, 0.875rem)',
+            marginBottom: '0.5rem',
+            fontWeight: 500,
+            color: 'rgba(255,255,255,0.7)',
+            margin: '0 0 0.5rem 0'
+          }}>
             {item.label}
           </p>
-          <p className="text-3xl font-bold">{item.value}</p>
+          <p style={{ 
+            fontSize: 'clamp(1.5rem, 4vw, 1.875rem)',
+            fontWeight: 700,
+            margin: 0
+          }}>
+            {item.value}
+          </p>
         </div>
       ))}
     </div>
@@ -373,7 +594,15 @@ export const ExecutiveSummaryCard: React.FC<{
 
 // Dashboard Title
 export const DashboardTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h3 className="text-2xl font-bold mb-8" style={{ color: '#203c42' }}>{children}</h3>
+  <h3 style={{ 
+    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+    fontWeight: 700,
+    marginBottom: '2rem',
+    color: '#203c42',
+    margin: '0 0 2rem 0'
+  }}>
+    {children}
+  </h3>
 );
 
 // Grid Layout
@@ -381,7 +610,12 @@ export const GridLayout: React.FC<{
   children: React.ReactNode;
   columns?: number;
 }> = ({ children, columns = 4 }) => (
-  <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${columns} gap-6 mb-10`}>
+  <div style={{ 
+    display: 'grid',
+    gridTemplateColumns: `repeat(auto-fit, minmax(${columns === 4 ? '200px' : '250px'}, 1fr))`,
+    gap: 'clamp(1rem, 2vw, 1.5rem)',
+    marginBottom: '2.5rem'
+  }}>
     {children}
   </div>
 );
