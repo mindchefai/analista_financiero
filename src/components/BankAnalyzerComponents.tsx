@@ -15,12 +15,14 @@ interface Stats {
   gastosGenerales: number;
   personal: number;
   materiaPrima: number;
+  otrosGastos: number;
   totalCostes: number;
   beneficio: number;
   ratios: {
     gastosVentas: number;
     personalVentas: number;
     materiaVentas: number;
+    otrosVentas: number;
     margen: string;
   };
 }
@@ -186,21 +188,305 @@ export const FAQ: React.FC = () => (
   </details>
 );
 
+// Modal de ayuda para descargar extracto
+export const HelpModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 9998,
+          animation: 'fadeIn 0.2s ease'
+        }}
+        onClick={onClose}
+      />
+      <div
+        style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'white',
+          borderRadius: '0.75rem',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          maxWidth: '42rem',
+          width: '90%',
+          maxHeight: '85vh',
+          overflowY: 'auto',
+          zIndex: 9999,
+          animation: 'slideIn 0.3s ease'
+        }}
+      >
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          backgroundColor: 'white',
+          borderBottom: '1px solid #e5e7eb',
+          padding: '1.25rem 1.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderRadius: '0.75rem 0.75rem 0 0',
+          zIndex: 1
+        }}>
+          <h3 style={{
+            margin: 0,
+            fontSize: '1.25rem',
+            fontWeight: 700,
+            color: '#203c42'
+          }}>
+            ¿Cómo descargar tu extracto de CaixaBank?
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0.375rem',
+              borderRadius: '0.375rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#6b7280',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f3f4f6';
+              e.currentTarget.style.color = '#111827';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#6b7280';
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div style={{ padding: '1.5rem' }}>
+          <div style={{
+            backgroundColor: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '0.5rem',
+            padding: '1rem',
+            marginBottom: '1.5rem'
+          }}>
+            <p style={{
+              margin: 0,
+              fontSize: '0.875rem',
+              color: '#1e40af',
+              lineHeight: '1.5'
+            }}>
+              <strong>💡 Consejo:</strong> El proceso completo toma menos de 2 minutos. Asegúrate de descargar el extracto en formato <strong>Excel (.xlsx)</strong> o <strong>CSV</strong>.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {[
+              {
+                step: '1',
+                title: 'Accede a CaixaBankNow',
+                description: 'Inicia sesión en tu banca online desde www.caixabank.es',
+                icon: '🌐'
+              },
+              {
+                step: '2',
+                title: 'Ve a "Mis cuentas"',
+                description: 'En el menú principal, selecciona la opción "Mis cuentas" y elige la cuenta de tu negocio',
+                icon: '💳'
+              },
+              {
+                step: '3',
+                title: 'Busca "Movimientos"',
+                description: 'Haz clic en "Ver movimientos" o "Consultar movimientos"',
+                icon: '📊'
+              },
+              {
+                step: '4',
+                title: 'Selecciona el período',
+                description: 'Elige el rango de fechas que quieres analizar (recomendamos mínimo 1 mes)',
+                icon: '📅'
+              },
+              {
+                step: '5',
+                title: 'Descarga el extracto',
+                description: 'Busca el botón de "Descargar" o "Exportar" y selecciona formato Excel (.xlsx) o CSV',
+                icon: '⬇️'
+              },
+              {
+                step: '6',
+                title: '¡Listo para subir!',
+                description: 'Sube el archivo aquí sin modificarlo. MindChef se encargará del resto',
+                icon: '✅'
+              }
+            ].map((step) => (
+              <div key={step.step} style={{
+                display: 'flex',
+                gap: '1rem',
+                paddingBottom: step.step !== '6' ? '1.5rem' : '0',
+                borderBottom: step.step !== '6' ? '1px solid #f3f4f6' : 'none'
+              }}>
+                <div style={{
+                  flexShrink: 0,
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  borderRadius: '50%',
+                  backgroundColor: '#203c42',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 700,
+                  fontSize: '1rem'
+                }}>
+                  {step.step}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontSize: '1.25rem',
+                    marginBottom: '0.25rem'
+                  }}>
+                    {step.icon}
+                  </div>
+                  <h4 style={{
+                    margin: '0 0 0.375rem 0',
+                    fontSize: '1rem',
+                    fontWeight: 600,
+                    color: '#203c42'
+                  }}>
+                    {step.title}
+                  </h4>
+                  <p style={{
+                    margin: 0,
+                    fontSize: '0.875rem',
+                    color: '#6b7280',
+                    lineHeight: '1.5'
+                  }}>
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{
+            marginTop: '1.5rem',
+            backgroundColor: '#fef3c7',
+            border: '1px solid #fde68a',
+            borderRadius: '0.5rem',
+            padding: '1rem'
+          }}>
+            <p style={{
+              margin: 0,
+              fontSize: '0.8125rem',
+              color: '#92400e',
+              lineHeight: '1.5'
+            }}>
+              <strong>⚠️ Importante:</strong> No edites ni borres ninguna fila o columna del archivo descargado. MindChef necesita el formato original del banco para procesarlo correctamente.
+            </p>
+          </div>
+        </div>
+
+        <div style={{
+          position: 'sticky',
+          bottom: 0,
+          backgroundColor: 'white',
+          borderTop: '1px solid #e5e7eb',
+          padding: '1rem 1.5rem',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          borderRadius: '0 0 0.75rem 0.75rem'
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              padding: '0.625rem 1.5rem',
+              backgroundColor: '#203c42',
+              color: 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              fontWeight: 500,
+              fontSize: '0.875rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#2a4c53';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#203c42';
+            }}
+          >
+            Entendido
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -48%);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+          }
+        }
+      `}</style>
+    </>
+  );
+};
+
 // Componente de pantalla de inicio (Upload)
 export const UploadScreen: React.FC<{ 
-  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void 
-}> = ({ onFileUpload }) => (
+  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onHelpClick: () => void;
+}> = ({ onFileUpload, onHelpClick }) => (
   <div style={{ textAlign: 'center', padding: '2rem 1.25rem' }}>
-    <div style={{ 
+    <label style={{ 
       marginBottom: '1.25rem',
       display: 'inline-block',
       padding: '1.25rem',
       borderRadius: '9999px',
       backgroundColor: '#f0f9ff',
-      border: '2px dashed #bfdbfe'
-    }}>
+      border: '2px dashed #bfdbfe',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease'
+    }}
+    className="hover-lift"
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = '#dbeafe';
+      e.currentTarget.style.borderColor = '#93c5fd';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = '#f0f9ff';
+      e.currentTarget.style.borderColor = '#bfdbfe';
+    }}
+    >
       <Upload size={40} style={{ color: '#2563eb' }} strokeWidth={1.5} />
-    </div>
+      <input
+        type="file"
+        accept=".csv,.xlsx,.xls,.txt"
+        onChange={onFileUpload}
+        style={{ display: 'none' }}
+      />
+    </label>
 
     <div style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
       <Upload size={18} style={{ color: '#203c42' }} />
@@ -227,28 +513,37 @@ export const UploadScreen: React.FC<{
 
     <FileRequirements />
 
-    <label 
-      className="hover-lift"
+    <button
+      onClick={onHelpClick}
       style={{
-        display: 'inline-block',
-        color: 'white',
-        padding: '0.75rem 1.75rem',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        color: '#2563eb',
+        padding: '0.625rem 1.25rem',
         borderRadius: '0.5rem',
         cursor: 'pointer',
         fontWeight: 500,
         fontSize: '0.875rem',
-        backgroundColor: '#203c42',
-        marginBottom: '1.25rem'
+        backgroundColor: 'transparent',
+        border: '1px solid #bfdbfe',
+        marginBottom: '1.25rem',
+        transition: 'all 0.2s ease'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#eff6ff';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
       }}
     >
-      Seleccionar archivo
-      <input
-        type="file"
-        accept=".csv,.xlsx,.xls,.txt"
-        onChange={onFileUpload}
-        style={{ display: 'none' }}
-      />
-    </label>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      ¿Cómo descargar el extracto?
+    </button>
 
     <SecurityBadge />
     <FAQ />
@@ -347,49 +642,52 @@ export const TransactionRow: React.FC<{
         {formatCurrency(transaction.importe)}
       </td>
       <td style={{ padding: '0.75rem 1rem' }}>
-        <select
-          value={transaction.categoria || ''}
-          onChange={(e) => onCategoryChange(transaction.id, e.target.value)}
-          style={{ 
-            width: '100%',
-            padding: '0.4rem 0.75rem',
-            paddingLeft: '2rem',
-            border: transaction.categoria ? '1px solid #e5e7eb' : '2px solid #fbbf24',
-            borderRadius: '0.375rem',
-            fontSize: '0.8125rem',
-            outline: 'none',
-            backgroundColor: 'white',
-            cursor: 'pointer',
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='${getCategoryColor(transaction.categoria)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E${getCategoryIcon(transaction.categoria)}%3C/svg%3E")`,
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: '0.625rem center',
-            backgroundSize: '14px 14px'
-          }}
-          onFocus={(e) => e.target.style.borderColor = '#e5b45f'}
-          onBlur={(e) => {
-            e.target.style.borderColor = transaction.categoria ? '#e5e7eb' : '#fbbf24';
-          }}
-        >
-          <option value="">Seleccionar...</option>
-          <option value="venta">Venta</option>
-          <option value="gastos">Gastos Generales</option>
-          <option value="personal">Personal</option>
-          <option value="materia">Materia Prima</option>
-          <option value="no-aplica">No Aplica</option>
-        </select>
+<select
+  value={transaction.categoria || ''}
+  onChange={(e) => onCategoryChange(transaction.id, e.target.value)}
+  style={{ 
+    width: '100%',
+    padding: '0.4rem 0.75rem',
+    paddingLeft: '2rem',
+    border: transaction.categoria ? '1px solid #e5e7eb' : '2px solid #fbbf24',
+    borderRadius: '0.375rem',
+    fontSize: '0.8125rem',
+    outline: 'none',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='${getCategoryColor(transaction.categoria)}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E${getCategoryIcon(transaction.categoria)}%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '0.625rem center',
+    backgroundSize: '14px 14px'
+  }}
+  onFocus={(e) => e.target.style.borderColor = '#e5b45f'}
+  onBlur={(e) => {
+    e.target.style.borderColor = transaction.categoria ? '#e5e7eb' : '#fbbf24';
+  }}
+>
+  <option value="">Seleccionar...</option>
+  <option value="venta">Venta</option>
+  <option value="gastos">Gastos Generales</option>
+  <option value="personal">Personal</option>
+  <option value="materia">Materia Prima</option>
+  <option value="otros">Otros Gastos</option>
+  <option value="no-aplica">No Aplica</option>
+</select>
       </td>
     </tr>
   );
 };
 
 // Gráfico de pastel
+// Gráfico de pastel
 export const PieChart: React.FC<{ stats: Stats; formatCurrency: (amount: number) => string }> = ({ stats, formatCurrency }) => {
   const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
   
-  const total = stats.gastosGenerales + stats.personal + stats.materiaPrima;
+  const total = stats.gastosGenerales + stats.personal + stats.materiaPrima + stats.otrosGastos;
   const gastosPercent = stats.ratios.gastosVentas;
   const personalPercent = stats.ratios.personalVentas;
   const materiaPercent = stats.ratios.materiaVentas;
+  const otrosPercent = stats.ratios.otrosVentas;
 
   if (total === 0) {
     return (
@@ -412,7 +710,8 @@ export const PieChart: React.FC<{ stats: Stats; formatCurrency: (amount: number)
   const legendItems = [
     { label: 'Gastos Generales', color: '#dc2626', value: stats.gastosGenerales, percent: gastosPercent, key: 'gastos', bg: '#fef2f2' },
     { label: 'Personal', color: '#f97316', value: stats.personal, percent: personalPercent, key: 'personal', bg: '#fff7ed' },
-    { label: 'Materia Prima', color: '#ec4899', value: stats.materiaPrima, percent: materiaPercent, key: 'materia', bg: '#fdf2f8' }
+    { label: 'Materia Prima', color: '#ec4899', value: stats.materiaPrima, percent: materiaPercent, key: 'materia', bg: '#fdf2f8' },
+    { label: 'Otros Gastos', color: '#8b5cf6', value: stats.otrosGastos, percent: otrosPercent, key: 'otros', bg: '#faf5ff' }
   ];
 
   return (
@@ -435,6 +734,7 @@ export const PieChart: React.FC<{ stats: Stats; formatCurrency: (amount: number)
       
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
         <svg width="140" height="140" viewBox="0 0 200 200">
+          {/* Gastos Generales */}
           <circle
             cx="100" cy="100" r="80"
             fill="transparent" stroke="#dc2626" strokeWidth="40"
@@ -448,6 +748,7 @@ export const PieChart: React.FC<{ stats: Stats; formatCurrency: (amount: number)
             onMouseEnter={() => setHoveredSegment('gastos')}
             onMouseLeave={() => setHoveredSegment(null)}
           />
+          {/* Personal */}
           <circle
             cx="100" cy="100" r="80"
             fill="transparent" stroke="#f97316" strokeWidth="40"
@@ -462,6 +763,7 @@ export const PieChart: React.FC<{ stats: Stats; formatCurrency: (amount: number)
             onMouseEnter={() => setHoveredSegment('personal')}
             onMouseLeave={() => setHoveredSegment(null)}
           />
+          {/* Materia Prima */}
           <circle
             cx="100" cy="100" r="80"
             fill="transparent" stroke="#ec4899" strokeWidth="40"
@@ -476,6 +778,22 @@ export const PieChart: React.FC<{ stats: Stats; formatCurrency: (amount: number)
             onMouseEnter={() => setHoveredSegment('materia')}
             onMouseLeave={() => setHoveredSegment(null)}
           />
+          {/* Otros Gastos */}
+          <circle
+            cx="100" cy="100" r="80"
+            fill="transparent" stroke="#8b5cf6" strokeWidth="40"
+            strokeDasharray={`${(otrosPercent / 100) * 502.65} 502.65`}
+            strokeDashoffset={-(((gastosPercent + personalPercent + materiaPercent) / 100) * 502.65)}
+            transform="rotate(-90 100 100)"
+            style={{ 
+              cursor: 'pointer',
+              opacity: hoveredSegment === 'otros' || !hoveredSegment ? 1 : 0.5,
+              transition: 'opacity 0.2s ease'
+            }}
+            onMouseEnter={() => setHoveredSegment('otros')}
+            onMouseLeave={() => setHoveredSegment(null)}
+          />
+          {/* Centro blanco con texto */}
           <circle cx="100" cy="100" r="60" fill="white" />
           <text x="100" y="92" textAnchor="middle" style={{ fontSize: '10px', fill: '#6b7280', fontWeight: 500 }}>
             Total

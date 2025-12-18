@@ -5,8 +5,8 @@ import {
   TrendingUp, 
   DollarSign, 
   PieChart as PieChartIcon,  
-  Sparkles, 
   TrendingDown,
+  Crown,
 } from 'lucide-react';
 import {
   GlobalStyles,
@@ -16,7 +16,6 @@ import {
   TabButton,
   ContentArea,
   SectionHeader,
-  PrimaryButton,
   TableContainer,
   TableHeader,
   DashboardTitle,
@@ -27,7 +26,8 @@ import {
   AutoCategorizeBanner,
   TransactionRow,
   PieChart,
-  BarChart
+  BarChart,
+  HelpModal,
 } from './BankAnalyzerComponents';
 
 interface Transaction {
@@ -44,12 +44,14 @@ interface Stats {
   gastosGenerales: number;
   personal: number;
   materiaPrima: number;
+  otrosGastos: number;
   totalCostes: number;
   beneficio: number;
   ratios: {
     gastosVentas: number;
     personalVentas: number;
     materiaVentas: number;
+    otrosVentas: number;
     margen: string;
   };
 }
@@ -79,6 +81,9 @@ const CATEGORIA_RULES = {
   materia: [
     /compra/i, /proveedor/i, /material/i, /suministro/i,
     /mercaderia/i, /stock/i,
+  ],
+  otros: [
+    /varios/i, /diverso/i, /miscelaneo/i
   ]
 };
 
@@ -86,6 +91,7 @@ const BankAnalyzer: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'datos' | 'resultados'>('datos');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [validated, setValidated] = useState<boolean>(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState<boolean>(false);
 
   const showError = (title: string, message: string) => {
     const errorDiv = document.createElement('div');
@@ -251,12 +257,8 @@ const BankAnalyzer: React.FC = () => {
   };
 
   const handleAutoCategorize = () => {
-    const updated = transactions.map(t => ({
-      ...t,
-      categoria: autoCategorize(t.concepto, t.importe),
-      autoCategoria: true
-    }));
-    setTransactions(updated);
+    // Función premium - preparada para integración futura con ChatGPT
+    alert('🔒 Función Premium\n\nLa auto-categorización inteligente con IA estará disponible próximamente. Esta función utilizará inteligencia artificial avanzada para categorizar tus transacciones de forma más precisa.');
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -290,67 +292,78 @@ const BankAnalyzer: React.FC = () => {
     }
   };
 
-  const stats = useMemo<Stats | null>(() => {
-    if (!validated) return null;
+const stats = useMemo<Stats | null>(() => {
+  if (!validated) return null;
 
-    const relevantTransactions = transactions.filter(t => t.categoria !== 'no-aplica');
+  const relevantTransactions = transactions.filter(t => t.categoria !== 'no-aplica');
 
-    const ventas = relevantTransactions
-      .filter(t => t.categoria === 'venta')
-      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+  const ventas = relevantTransactions
+    .filter(t => t.categoria === 'venta')
+    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-    const gastosGenerales = relevantTransactions
-      .filter(t => t.categoria === 'gastos')
-      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+  const gastosGenerales = relevantTransactions
+    .filter(t => t.categoria === 'gastos')
+    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-    const personal = relevantTransactions
-      .filter(t => t.categoria === 'personal')
-      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+  const personal = relevantTransactions
+    .filter(t => t.categoria === 'personal')
+    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-    const materiaPrima = relevantTransactions
-      .filter(t => t.categoria === 'materia')
-      .reduce((sum, t) => sum + Math.abs(t.importe), 0);
+  const materiaPrima = relevantTransactions
+    .filter(t => t.categoria === 'materia')
+    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-    const totalCostes = gastosGenerales + personal + materiaPrima;
-    const beneficio = ventas - totalCostes;
+  const otrosGastos = relevantTransactions
+    .filter(t => t.categoria === 'otros')
+    .reduce((sum, t) => sum + Math.abs(t.importe), 0);
 
-    const gastosPercent = totalCostes > 0 ? (gastosGenerales / totalCostes) * 100 : 0;
-    const personalPercent = totalCostes > 0 ? (personal / totalCostes) * 100 : 0;
-    const materiaPercent = totalCostes > 0 ? (materiaPrima / totalCostes) * 100 : 0;
+  const totalCostes = gastosGenerales + personal + materiaPrima + otrosGastos;
+  const beneficio = ventas - totalCostes;
 
-    let gastosRounded = Math.round(gastosPercent);
-    let personalRounded = Math.round(personalPercent);
-    let materiaRounded = Math.round(materiaPercent);
+  const gastosPercent = totalCostes > 0 ? (gastosGenerales / totalCostes) * 100 : 0;
+  const personalPercent = totalCostes > 0 ? (personal / totalCostes) * 100 : 0;
+  const materiaPercent = totalCostes > 0 ? (materiaPrima / totalCostes) * 100 : 0;
+  const otrosPercent = totalCostes > 0 ? (otrosGastos / totalCostes) * 100 : 0;
 
-    if (totalCostes > 0) {
-      const sum = gastosRounded + personalRounded + materiaRounded;
-      if (sum !== 100) {
-        const diff = 100 - sum;
-        if (gastosPercent >= personalPercent && gastosPercent >= materiaPercent) {
-          gastosRounded += diff;
-        } else if (personalPercent >= materiaPercent) {
-          personalRounded += diff;
-        } else {
-          materiaRounded += diff;
-        }
+  let gastosRounded = Math.round(gastosPercent);
+  let personalRounded = Math.round(personalPercent);
+  let materiaRounded = Math.round(materiaPercent);
+  let otrosRounded = Math.round(otrosPercent);
+
+  if (totalCostes > 0) {
+    const sum = gastosRounded + personalRounded + materiaRounded + otrosRounded;
+    if (sum !== 100) {
+      const diff = 100 - sum;
+      const max = Math.max(gastosPercent, personalPercent, materiaPercent, otrosPercent);
+      if (gastosPercent === max) {
+        gastosRounded += diff;
+      } else if (personalPercent === max) {
+        personalRounded += diff;
+      } else if (materiaPercent === max) {
+        materiaRounded += diff;
+      } else {
+        otrosRounded += diff;
       }
     }
+  }
 
-    return {
-      ventas,
-      gastosGenerales,
-      personal,
-      materiaPrima,
-      totalCostes,
-      beneficio,
-      ratios: {
-        gastosVentas: gastosRounded,
-        personalVentas: personalRounded,
-        materiaVentas: materiaRounded,
-        margen: ventas > 0 ? (beneficio / ventas * 100).toFixed(1) : '0.0'
-      }
-    };
-  }, [transactions, validated]);
+  return {
+    ventas,
+    gastosGenerales,
+    personal,
+    materiaPrima,
+    otrosGastos,
+    totalCostes,
+    beneficio,
+    ratios: {
+      gastosVentas: gastosRounded,
+      personalVentas: personalRounded,
+      materiaVentas: materiaRounded,
+      otrosVentas: otrosRounded,
+      margen: ventas > 0 ? (beneficio / ventas * 100).toFixed(1) : '0.0'
+    }
+  };
+}, [transactions, validated]);
 
   const dailySales = useMemo<DailySales[]>(() => {
     if (!validated) return [];
@@ -388,49 +401,109 @@ const BankAnalyzer: React.FC = () => {
     value: string; 
     icon: React.ReactNode;
     variant: 'success' | 'danger';
-  }> = ({ title, value, icon, variant }) => (
-    <div style={{ 
-      border: '1px solid #e5e7eb',
-      padding: '0.875rem',
-      borderRadius: '0.5rem',
-      backgroundColor: 'white',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-      transition: 'transform 0.2s ease',
-    }}
-    className="hover-lift"
-    >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
-        <h4 style={{ 
-          fontSize: '0.7rem', 
-          fontWeight: 600, 
-          textTransform: 'uppercase', 
-          letterSpacing: '0.05em',
-          color: '#6b7280',
+    tooltip?: string;
+  }> = ({ title, value, icon, variant, tooltip }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    
+    return (
+      <div 
+        style={{ 
+          border: '1px solid #e5e7eb',
+          padding: '0.875rem',
+          borderRadius: '0.5rem',
+          backgroundColor: 'white',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          transition: 'transform 0.2s ease',
+          position: 'relative'
+        }}
+        className="hover-lift"
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+            <h4 style={{ 
+              fontSize: '0.7rem', 
+              fontWeight: 600, 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.05em',
+              color: '#6b7280',
+              margin: 0
+            }}>
+              {title}
+            </h4>
+            {tooltip && (
+              <div 
+                style={{ position: 'relative', display: 'inline-flex' }}
+                onMouseEnter={() => setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+              >
+                <svg 
+                  width="14" 
+                  height="14" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="#9ca3af" 
+                  strokeWidth="2"
+                  style={{ cursor: 'help' }}
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                {showTooltip && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 'calc(100% + 0.5rem)',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: '#1f2937',
+                    color: 'white',
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.75rem',
+                    whiteSpace: 'nowrap',
+                    zIndex: 1000,
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                    animation: 'fadeIn 0.2s ease'
+                  }}>
+                    {tooltip}
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 0,
+                      height: 0,
+                      borderLeft: '5px solid transparent',
+                      borderRight: '5px solid transparent',
+                      borderTop: '5px solid #1f2937'
+                    }}></div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          <div style={{ 
+            padding: '0.3rem', 
+            borderRadius: '0.3rem',
+            backgroundColor: variant === 'success' ? '#dcfce7' : '#fee2e2'
+          }}>
+            {React.cloneElement(icon as React.ReactElement, { 
+              size: 14, 
+              style: { color: variant === 'success' ? '#059669' : '#dc2626' } 
+            })}
+          </div>
+        </div>
+        <p style={{ 
+          fontSize: '1.25rem', 
+          fontWeight: 700,
+          color: variant === 'success' ? '#059669' : '#dc2626',
           margin: 0
         }}>
-          {title}
-        </h4>
-        <div style={{ 
-          padding: '0.3rem', 
-          borderRadius: '0.3rem',
-          backgroundColor: variant === 'success' ? '#dcfce7' : '#fee2e2'
-        }}>
-          {React.cloneElement(icon as React.ReactElement, { 
-            size: 14, 
-            style: { color: variant === 'success' ? '#059669' : '#dc2626' } 
-          })}
-        </div>
+          {value}
+        </p>
       </div>
-      <p style={{ 
-        fontSize: '1.25rem', 
-        fontWeight: 700,
-        color: variant === 'success' ? '#059669' : '#dc2626',
-        margin: 0
-      }}>
-        {value}
-      </p>
-    </div>
-  );
+    );
+  };
 
   return (
     <>
@@ -463,51 +536,138 @@ const BankAnalyzer: React.FC = () => {
             {activeTab === 'datos' && (
               <div>
                 {transactions.length === 0 ? (
-                  <UploadScreen onFileUpload={handleFileUpload} />
+                  <>
+                    <UploadScreen 
+                      onFileUpload={handleFileUpload}
+                      onHelpClick={() => setIsHelpModalOpen(true)}
+                    />
+                    <HelpModal 
+                      isOpen={isHelpModalOpen}
+                      onClose={() => setIsHelpModalOpen(false)}
+                    />
+                  </>
                 ) : (
                   <div>
-                    <SectionHeader
-                      title="Categoriza tus transacciones"
-                      subtitle={`${categorizedCount} de ${transactions.length} categorizadas${autoCategorizedCount > 0 ? ` (${autoCategorizedCount} automáticas)` : ''}`}
-                    >
-                      <label 
-                        className="px-4 py-2 rounded-lg cursor-pointer font-medium text-sm transition-all"
-                        style={{ backgroundColor: '#f3f4f6', color: '#374151' }}
-                      >
-                        Cambiar archivo
-                        <input
-                          type="file"
-                          accept=".csv,.xlsx,.xls,.txt"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                        />
-                      </label>
-                      <button
-                        onClick={handleAutoCategorize}
-                        style={{
-                          padding: '0.5rem 1rem',
-                          borderRadius: '0.5rem',
-                          fontWeight: 500,
-                          fontSize: '0.8125rem',
-                          backgroundColor: '#f3f4f6',
-                          color: '#374151',
-                          border: 'none',
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.375rem',
-                          transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
-                      >
-                        <Sparkles size={14} />
-                        Auto-categorizar
-                      </button>
-                      <PrimaryButton onClick={handleValidate} icon={<Check size={16} />}>
-                        Validar
-                      </PrimaryButton>
-                    </SectionHeader>
+<SectionHeader
+  title="Categoriza tus transacciones"
+  subtitle={`${categorizedCount} de ${transactions.length} categorizadas${autoCategorizedCount > 0 ? ` (${autoCategorizedCount} automáticas)` : ''}`}
+>
+  <label 
+    style={{ 
+      padding: '0.625rem 1.25rem',
+      borderRadius: '0.5rem',
+      fontWeight: 500,
+      fontSize: '0.875rem',
+      backgroundColor: '#f9fafb',
+      color: '#374151',
+      border: '1px solid #e5e7eb',
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      transition: 'all 0.2s ease',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.backgroundColor = '#f3f4f6';
+      e.currentTarget.style.borderColor = '#d1d5db';
+      e.currentTarget.style.transform = 'translateY(-1px)';
+      e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.backgroundColor = '#f9fafb';
+      e.currentTarget.style.borderColor = '#e5e7eb';
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+    }}
+  >
+    <Upload size={16} style={{ color: '#6b7280' }} />
+    Cambiar archivo
+    <input
+      type="file"
+      accept=".csv,.xlsx,.xls,.txt"
+      onChange={handleFileUpload}
+      style={{ display: 'none' }}
+    />
+  </label>
+
+  <button
+    onClick={handleAutoCategorize}
+    style={{
+      padding: '0.625rem 1.25rem',
+      borderRadius: '0.5rem',
+      fontWeight: 600,
+      fontSize: '0.875rem',
+      background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+      color: '#ffffff',
+      border: 'none',
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 12px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
+      position: 'relative',
+      overflow: 'hidden'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0 8px 20px rgba(251, 191, 36, 0.45), inset 0 1px 0 rgba(255,255,255,0.2)';
+      e.currentTarget.style.background = '#d97706';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)';
+      e.currentTarget.style.background = '#f59e0b';
+    }}
+  >
+    <Crown 
+      size={16} 
+      style={{ 
+        filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
+        animation: 'pulse 2s ease-in-out infinite'
+      }} 
+    />
+    <span style={{ 
+      textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+      letterSpacing: '0.015em'
+    }}>
+      Auto-categorizar
+    </span>
+  </button>
+
+  <button
+    onClick={handleValidate}
+    style={{
+      padding: '0.625rem 1.25rem',
+      borderRadius: '0.5rem',
+      fontWeight: 600,
+      fontSize: '0.875rem',
+      background: '#047857',
+      color: 'white',
+      border: 'none',
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '0.5rem',
+      transition: 'all 0.2s ease',
+      boxShadow: '0 2px 8px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255,255,255,0.15)'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-1px)';
+      e.currentTarget.style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.35), inset 0 1px 0 rgba(255,255,255,0.15)';
+      e.currentTarget.style.background = '#065f46';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = '0 2px 8px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255,255,255,0.15)';
+      e.currentTarget.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)';
+    }}
+  >
+    <Check size={16} />
+    Validar
+  </button>
+</SectionHeader>
 
                     {autoCategorizedCount > 0 && (
                       <AutoCategorizeBanner count={autoCategorizedCount} />
@@ -548,24 +708,28 @@ const BankAnalyzer: React.FC = () => {
                     value={formatCurrency(stats.ventas)}
                     icon={<TrendingUp />}
                     variant="success"
+                    tooltip="Ingresos"
                   />
                   <CompactKPI
                     title="Costes Totales"
                     value={formatCurrency(stats.totalCostes)}
                     icon={<TrendingDown />}
                     variant="danger"
+                    tooltip="Costes operativos"
                   />
                   <CompactKPI
-                    title="Beneficio"
+                    title="Beneficio operativo"
                     value={formatCurrency(stats.beneficio)}
                     icon={<DollarSign />}
                     variant={stats.beneficio >= 0 ? 'success' : 'danger'}
+                    tooltip="Dinero que te queda"
                   />
                   <CompactKPI
-                    title="Margen"
+                    title="Margen operativo"
                     value={`${stats.ratios.margen}%`}
                     icon={<PieChartIcon />}
                     variant={parseFloat(stats.ratios.margen) >= 0 ? 'success' : 'danger'}
+                    tooltip="Rentabilidad"
                   />
                 </div>
 

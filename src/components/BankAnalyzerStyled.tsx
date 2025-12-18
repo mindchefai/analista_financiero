@@ -65,7 +65,7 @@ export const Header: React.FC<{ icon: React.ReactNode; title: string; subtitle: 
   subtitle 
 }) => (
   <div style={{ 
-    background: 'linear-gradient(135deg, #203c42 0%, #2a4c53 100%)',
+    background: '#203c42',
     padding: '2rem'
   }}>
     <div className="flex items-center gap-4 mb-2">
@@ -180,7 +180,7 @@ export const PrimaryButton: React.FC<{
   <button
     onClick={onClick}
     className="text-white px-6 py-2.5 rounded-lg font-medium flex items-center gap-2 text-sm hover-lift"
-    style={{ background: 'linear-gradient(135deg, #e5b45f 0%, #f8b64a 100%)' }}
+    style={{ background: '#e5b45f' }}
   >
     {icon}
     {children}
@@ -355,7 +355,7 @@ export const ExecutiveSummaryCard: React.FC<{
   items: Array<{ label: string; value: string }> 
 }> = ({ items }) => (
   <div className="p-8 rounded-lg text-white" style={{
-    background: 'linear-gradient(135deg, #203c42 0%, #2a4c53 100%)'
+    background: '#203c42'
   }}>
     <h4 className="text-xl font-bold mb-6">Resumen Ejecutivo</h4>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
