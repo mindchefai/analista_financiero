@@ -7,20 +7,21 @@ function App() {
   const [currentView, setCurrentView] = useState<'landing' | 'analyzer'>('landing');
 
   useEffect(() => {
-    // Verificar si el usuario está en la ruta del analizador
-    if (window.location.pathname === '/analyzer') {
-      setCurrentView('analyzer');
-    }
-  }, []);
-
-  // Simular navegación básica
-  useEffect(() => {
-    const handlePopState = () => {
-      if (window.location.pathname === '/analyzer') {
+    // Verificar la ruta actual al cargar
+    const checkPath = () => {
+      const path = window.location.pathname;
+      if (path === '/analyzer' || path === '/analyzer/') {
         setCurrentView('analyzer');
       } else {
         setCurrentView('landing');
       }
+    };
+
+    checkPath();
+
+    // Escuchar cambios en la URL
+    const handlePopState = () => {
+      checkPath();
     };
 
     window.addEventListener('popstate', handlePopState);

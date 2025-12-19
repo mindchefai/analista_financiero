@@ -228,7 +228,7 @@ const BankAnalyzerLanding: React.FC = () => {
       }
       
       console.log('Login exitoso para:', data.nombre);
-      
+
       try {
         sessionStorage.setItem('userEmail', data.email);
         sessionStorage.setItem('userName', data.nombre);
@@ -236,8 +236,10 @@ const BankAnalyzerLanding: React.FC = () => {
       } catch (storageError) {
         console.warn('No se pudo guardar en sessionStorage:', storageError);
       }
-      
-      window.location.href = '/analyzer';
+
+      // Navegar a /analyzer
+      window.history.pushState({}, '', '/analyzer');
+      window.location.reload();
       
     } catch (err) {
       console.error('Error en login:', err);

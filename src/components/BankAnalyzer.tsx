@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Upload, 
   Check, 
@@ -93,6 +93,18 @@ const BankAnalyzer: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [validated, setValidated] = useState<boolean>(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState<boolean>(false);
+
+  
+  // 🔒 PROTECCIÓN DE RUTA - Verificar autenticación
+  useEffect(() => {
+    const userEmail = sessionStorage.getItem('userEmail');
+    if (!userEmail) {
+      // Si no hay sesión, redirigir al landing
+      window.history.pushState({}, '', '/');
+      window.location.reload();
+    }
+  }, []);
+
 
   const showError = (title: string, message: string) => {
     const errorDiv = document.createElement('div');
