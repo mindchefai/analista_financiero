@@ -143,7 +143,7 @@ export const SecurityBadge: React.FC = () => (
       margin: 0,
       lineHeight: '1.3'
     }}>
-      Tus datos son privados y solo se usan para generar tu análisis financiero.
+      Tus datos son privados y solo se usan para generar tu análisis financiero. No se almacenan ni comparten con terceros.
     </p>
   </div>
 );
@@ -216,9 +216,9 @@ export const HelpModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
           backgroundColor: 'white',
           borderRadius: '0.75rem',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-          maxWidth: '42rem',
-          width: '90%',
-          maxHeight: '85vh',
+          maxWidth: '56rem',
+          width: '95%',
+          maxHeight: '90vh',
           overflowY: 'auto',
           zIndex: 9999,
           animation: 'slideIn 0.3s ease'
@@ -229,7 +229,7 @@ export const HelpModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
           top: 0,
           backgroundColor: 'white',
           borderBottom: '1px solid #e5e7eb',
-          padding: '1.25rem 1.5rem',
+          padding: '1rem 1.5rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -238,7 +238,7 @@ export const HelpModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
         }}>
           <h3 style={{
             margin: 0,
-            fontSize: '1.25rem',
+            fontSize: 'clamp(1rem, 3vw, 1.25rem)',
             fontWeight: 700,
             color: '#203c42'
           }}>
@@ -256,7 +256,8 @@ export const HelpModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
               alignItems: 'center',
               justifyContent: 'center',
               color: '#6b7280',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              flexShrink: 0
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#f3f4f6';
@@ -274,127 +275,124 @@ export const HelpModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
           </button>
         </div>
 
-        <div style={{ padding: '1.5rem' }}>
-          <div style={{
-            backgroundColor: '#eff6ff',
-            border: '1px solid #bfdbfe',
-            borderRadius: '0.5rem',
-            padding: '1rem',
-            marginBottom: '1.5rem'
-          }}>
-            <p style={{
-              margin: 0,
-              fontSize: '0.875rem',
-              color: '#1e40af',
-              lineHeight: '1.5'
-            }}>
-              <strong>💡 Consejo:</strong> El proceso completo toma menos de 2 minutos. Asegúrate de descargar el extracto en formato <strong>Excel (.xlsx)</strong> o <strong>CSV</strong>.
-            </p>
-          </div>
+        <div style={{ padding: 'clamp(1rem, 3vw, 1.5rem)' }}>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {[
               {
                 step: '1',
-                title: 'Accede a CaixaBankNow',
-                description: 'Inicia sesión en tu banca online desde www.caixabank.es',
-                icon: '🌐'
+                title: 'Accede a la cuenta del banco',
+                description: 'Inicia sesión en CaixaBankNow y accede a la cuenta que quieres analizar',
+                image: '/screenshots_bank/1.png'
               },
               {
                 step: '2',
-                title: 'Ve a "Mis cuentas"',
-                description: 'En el menú principal, selecciona la opción "Mis cuentas" y elige la cuenta de tu negocio',
-                icon: '💳'
+                title: 'Abre el menú de funcionalidades',
+                description: 'Dentro de la cuenta, pulsa en el menú de funcionalidades (tres puntos) para ver las opciones',
+                image: '/screenshots_bank/2.png'
               },
               {
                 step: '3',
-                title: 'Busca "Movimientos"',
-                description: 'Haz clic en "Ver movimientos" o "Consultar movimientos"',
-                icon: '📊'
+                title: 'Accede a "Extraer movimientos PDF/Excel"',
+                description: 'Selecciona la opción "Extraer movimientos PDF/Excel" del menú desplegable',
+                image: '/screenshots_bank/3.png'
               },
               {
                 step: '4',
-                title: 'Selecciona el período',
-                description: 'Elige el rango de fechas que quieres analizar (recomendamos mínimo 1 mes)',
-                icon: '📅'
+                title: 'Elige las fechas y el formato',
+                description: 'Elige las fechas que quieras extraer y el formato (PDF / Excel), recomendamos Excel',
+                image: '/screenshots_bank/4.png'
               },
               {
                 step: '5',
-                title: 'Descarga el extracto',
-                description: 'Busca el botón de "Descargar" o "Exportar" y selecciona formato Excel (.xlsx) o CSV',
-                icon: '⬇️'
+                title: 'Descarga desde el navegador',
+                description: 'Se abrirá el extracto, pero hay que descargarlo. Para ello usa el navegador que tengas instalado (en el caso de la imagen, es Chrome)',
+                image: '/screenshots_bank/5.png'
               },
               {
                 step: '6',
-                title: '¡Listo para subir!',
-                description: 'Sube el archivo aquí sin modificarlo. MindChef se encargará del resto',
-                icon: '✅'
+                title: '¡Guarda y analiza!',
+                description: 'Se abrirá un modal para guardar dicho documento y ya lo tendrás listo para subir y analizar',
+                image: '/screenshots_bank/6.png'
               }
             ].map((step) => (
               <div key={step.step} style={{
                 display: 'flex',
+                flexDirection: 'column',
                 gap: '1rem',
-                paddingBottom: step.step !== '6' ? '1.5rem' : '0',
+                paddingBottom: step.step !== '6' ? '2rem' : '0',
                 borderBottom: step.step !== '6' ? '1px solid #f3f4f6' : 'none'
               }}>
-                <div style={{
-                  flexShrink: 0,
-                  width: '2.5rem',
-                  height: '2.5rem',
-                  borderRadius: '50%',
-                  backgroundColor: '#203c42',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 700,
-                  fontSize: '1rem'
-                }}>
-                  {step.step}
-                </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'start' }}>
                   <div style={{
-                    fontSize: '1.25rem',
-                    marginBottom: '0.25rem'
+                    flexShrink: 0,
+                    width: '2.5rem',
+                    height: '2.5rem',
+                    borderRadius: '50%',
+                    backgroundColor: '#203c42',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                    fontSize: '1rem'
                   }}>
-                    {step.icon}
+                    {step.step}
                   </div>
-                  <h4 style={{
-                    margin: '0 0 0.375rem 0',
-                    fontSize: '1rem',
-                    fontWeight: 600,
-                    color: '#203c42'
-                  }}>
-                    {step.title}
-                  </h4>
-                  <p style={{
-                    margin: 0,
-                    fontSize: '0.875rem',
-                    color: '#6b7280',
-                    lineHeight: '1.5'
-                  }}>
-                    {step.description}
-                  </p>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h4 style={{
+                      margin: '0 0 0.375rem 0',
+                      fontSize: 'clamp(0.9375rem, 2.5vw, 1.125rem)',
+                      fontWeight: 600,
+                      color: '#203c42'
+                    }}>
+                      {step.title}
+                    </h4>
+                    <p style={{
+                      margin: 0,
+                      fontSize: 'clamp(0.8125rem, 2vw, 0.875rem)',
+                      color: '#6b7280',
+                      lineHeight: '1.5'
+                    }}>
+                      {step.description}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Imagen del paso */}
+                <div style={{
+                  borderRadius: '0.5rem',
+                  overflow: 'hidden',
+                  border: '2px solid #e5e7eb',
+                  backgroundColor: '#f9fafb',
+                  maxWidth: '220px',
+                  margin: '0 auto',
+                  width: '100%'
+                }}>
+                  <img 
+                    src={step.image}
+                    alt={step.title}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      display: 'block'
+                    }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `
+                          <div style="padding: 2rem; text-align: center; color: #9ca3af; aspect-ratio: 350/760;">
+                            <p style="margin: 0;">Imagen no disponible</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.75rem;">${step.image}</p>
+                          </div>
+                        `;
+                      }
+                    }}
+                  />
                 </div>
               </div>
             ))}
-          </div>
-
-          <div style={{
-            marginTop: '1.5rem',
-            backgroundColor: '#fef3c7',
-            border: '1px solid #fde68a',
-            borderRadius: '0.5rem',
-            padding: '1rem'
-          }}>
-            <p style={{
-              margin: 0,
-              fontSize: '0.8125rem',
-              color: '#92400e',
-              lineHeight: '1.5'
-            }}>
-              <strong>⚠️ Importante:</strong> No edites ni borres ninguna fila o columna del archivo descargado. MindChef necesita el formato original del banco para procesarlo correctamente.
-            </p>
           </div>
         </div>
 
@@ -417,7 +415,7 @@ export const HelpModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ 
               border: 'none',
               borderRadius: '0.5rem',
               fontWeight: 500,
-              fontSize: '0.875rem',
+              fontSize: 'clamp(0.8125rem, 2vw, 0.875rem)',
               cursor: 'pointer',
               transition: 'all 0.2s ease'
             }}
