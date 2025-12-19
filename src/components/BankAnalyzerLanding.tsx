@@ -1,5 +1,11 @@
+// BankAnalyzerLanding.tsx (RESTAURADO CON ESTILOS ORIGINALES)
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, Building, User, Loader2, LogIn, UserPlus, Eye, EyeOff, Copy, Check, DollarSign, Coins, Euro, TrendingUp, TrendingDown, PiggyBank, Wallet, CreditCard, Banknote, ChartBar, ChartLine } from 'lucide-react';
+import { 
+  Mail, Lock, Building, User, Loader2, LogIn, UserPlus, 
+  Eye, EyeOff, Copy, Check, DollarSign, Coins, Euro, 
+  TrendingUp, TrendingDown, PiggyBank, Wallet, CreditCard, 
+  Banknote, ChartBar, ChartLine 
+} from 'lucide-react';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 
@@ -12,12 +18,11 @@ interface UserData {
 
 interface FloatingIcon {
   id: number;
-  type: 'dollar' | 'coins' |'euro' | 'piggy' | 'wallet' | 'card' | 'bill' | 'chartBar' | 'chartLine' | 'trendUp' | 'trendDown';
+  type: 'dollar' | 'coins' | 'euro' | 'piggy' | 'wallet' | 'card' | 'bill' | 'chartBar' | 'chartLine' | 'trendUp' | 'trendDown';
   left: number;
   delay: number;
   duration: number;
   size: number;
-  rotation: number;
 }
 
 const BankAnalyzerLanding: React.FC = () => {
@@ -47,7 +52,7 @@ const BankAnalyzerLanding: React.FC = () => {
   useEffect(() => {
     if (mode === 'initial') {
       const icons: FloatingIcon[] = [];
-      const types: Array<'dollar' | 'coins' |'euro' | 'piggy' | 'wallet' | 'card' | 'bill' | 'chartBar' | 'chartLine' | 'trendUp' | 'trendDown'> = 
+      const types: Array<FloatingIcon['type']> = 
         ['dollar', 'coins', 'euro', 'piggy', 'wallet', 'card', 'bill', 'chartBar', 'chartLine', 'trendUp', 'trendDown'];
       
       for (let i = 0; i < 20; i++) {
@@ -57,8 +62,7 @@ const BankAnalyzerLanding: React.FC = () => {
           left: Math.random() * 100,
           delay: Math.random() * 5,
           duration: 10 + Math.random() * 8,
-          size: 24 + Math.random() * 32,
-          rotation: Math.random() * 360
+          size: 24 + Math.random() * 32
         });
       }
       setFloatingIcons(icons);
@@ -71,7 +75,6 @@ const BankAnalyzerLanding: React.FC = () => {
     const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const numbers = '0123456789';
     const symbols = '!@#$%&*';
-    
     const allChars = lowercase + uppercase + numbers + symbols;
     
     let password = '';
@@ -100,7 +103,6 @@ const BankAnalyzerLanding: React.FC = () => {
     setRegisterData({ ...registerData, telefono: value || '' });
     setPhoneError('');
     
-    // Validar en tiempo real si hay valor
     if (value) {
       try {
         if (!isValidPhoneNumber(value)) {
@@ -128,7 +130,6 @@ const BankAnalyzerLanding: React.FC = () => {
       return;
     }
     
-    // Validar teléfono con librería
     try {
       if (!isValidPhoneNumber(registerData.telefono)) {
         setError('Por favor, introduce un número de teléfono válido para el país seleccionado');
@@ -152,20 +153,16 @@ const BankAnalyzerLanding: React.FC = () => {
         Name: registerData.nombre,
         Email: registerData.email,
         Company: registerData.empresa,
-        Phone: registerData.telefono, // Ya viene en formato internacional (ej: +34612345678)
+        Phone: registerData.telefono,
         Password: newPassword,
         fecha_registro: new Date().toISOString()
       };
-      
-      console.log('Enviando datos de registro:', { ...payload, Password: '***' });
       
       const response = await fetch(webhookURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      
-      console.log('Respuesta del webhook:', response.status);
       
       if (!response.ok) {
         throw new Error(`Error del servidor: ${response.status}`);
@@ -201,8 +198,6 @@ const BankAnalyzerLanding: React.FC = () => {
     try {
       const loginWebhookURL = 'https://hook.eu2.make.com/9k1xqiqpwr2wxrtanurzv1tc6ffnsv4r';
       
-      console.log('Intentando login con:', { email: loginData.email });
-      
       const response = await fetch(loginWebhookURL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -212,8 +207,6 @@ const BankAnalyzerLanding: React.FC = () => {
         })
       });
       
-      console.log('Respuesta del servidor:', response.status);
-      
       let data;
       try {
         data = await response.json();
@@ -221,14 +214,10 @@ const BankAnalyzerLanding: React.FC = () => {
         throw new Error('Error al procesar la respuesta del servidor');
       }
       
-      console.log('Datos recibidos:', data);
-      
       if (!response.ok || !data.success) {
         throw new Error(data.message || 'Credenciales incorrectas');
       }
       
-      console.log('Login exitoso para:', data.nombre);
-
       try {
         sessionStorage.setItem('userEmail', data.email);
         sessionStorage.setItem('userName', data.nombre);
@@ -237,7 +226,6 @@ const BankAnalyzerLanding: React.FC = () => {
         console.warn('No se pudo guardar en sessionStorage:', storageError);
       }
 
-      // Navegar a /analyzer
       window.history.pushState({}, '', '/analyzer');
       window.location.reload();
       
@@ -258,12 +246,7 @@ const BankAnalyzerLanding: React.FC = () => {
   };
 
   const handleContinueAfterRegister = () => {
-    setRegisterData({
-      nombre: '',
-      email: '',
-      empresa: '',
-      telefono: ''
-    });
+    setRegisterData({ nombre: '', email: '', empresa: '', telefono: '' });
     setGeneratedPassword('');
     setSuccess('');
     setMode('login');
@@ -304,6 +287,7 @@ const BankAnalyzerLanding: React.FC = () => {
     );
   };
 
+  // PANTALLA INICIAL
   if (mode === 'initial') {
     return (
       <div style={{
@@ -316,7 +300,6 @@ const BankAnalyzerLanding: React.FC = () => {
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Iconos flotantes */}
         {floatingIcons.map(icon => renderFloatingIcon(icon))}
         
         <div style={{
@@ -339,7 +322,9 @@ const BankAnalyzerLanding: React.FC = () => {
               src="/MindChef_white.png" 
               alt="MindChef" 
               style={{ height: '64px', width: 'auto' }}
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { 
+                e.currentTarget.style.display = 'none'; 
+              }}
             />
             <h1 style={{
               fontSize: 'clamp(2rem, 5vw, 3rem)',
@@ -355,7 +340,7 @@ const BankAnalyzerLanding: React.FC = () => {
             marginBottom: '1rem',
             opacity: 0.9
           }}>
-            Analiza tus gastos reales en 2 minutos
+            Analiza tus ingresos y gastos en 2 minutos
           </p>
           
           <p style={{
@@ -377,7 +362,7 @@ const BankAnalyzerLanding: React.FC = () => {
                 padding: '1rem 2rem',
                 fontSize: '1.125rem',
                 fontWeight: 600,
-                background: 'linear-gradient(135deg, #e5b45f 0%, #d4a04a 100%)',
+                background: '#e5b45f',
                 color: 'white',
                 border: 'none',
                 borderRadius: '0.75rem',
@@ -444,6 +429,7 @@ const BankAnalyzerLanding: React.FC = () => {
     );
   }
 
+  // PANTALLA DE REGISTRO
   if (mode === 'register') {
     return (
       <div style={{
@@ -578,7 +564,7 @@ const BankAnalyzerLanding: React.FC = () => {
                   padding: '0.875rem',
                   fontSize: '1rem',
                   fontWeight: 600,
-                  background: 'linear-gradient(135deg, #e5b45f 0%, #d4a04a 100%)',
+                  background: '#d4a04a',
                   color: 'white',
                   border: 'none',
                   borderRadius: '0.5rem',
@@ -619,7 +605,7 @@ const BankAnalyzerLanding: React.FC = () => {
                   <input
                     type="text"
                     value={registerData.nombre}
-                    onChange={(e) => setRegisterData({ ...registerData, nombre: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRegisterData({ ...registerData, nombre: e.target.value })}
                     placeholder="Tu nombre completo"
                     style={{
                       width: '100%',
@@ -656,7 +642,7 @@ const BankAnalyzerLanding: React.FC = () => {
                   <input
                     type="email"
                     value={registerData.email}
-                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRegisterData({ ...registerData, email: e.target.value })}
                     placeholder="tu@email.com"
                     style={{
                       width: '100%',
@@ -693,7 +679,7 @@ const BankAnalyzerLanding: React.FC = () => {
                   <input
                     type="text"
                     value={registerData.empresa}
-                    onChange={(e) => setRegisterData({ ...registerData, empresa: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRegisterData({ ...registerData, empresa: e.target.value })}
                     placeholder="Nombre de tu negocio de hostelería"
                     style={{
                       width: '100%',
@@ -725,9 +711,7 @@ const BankAnalyzerLanding: React.FC = () => {
                     value={registerData.telefono}
                     onChange={handlePhoneChange}
                     placeholder="Ingresa tu número de teléfono"
-                    style={{
-                      width: '100%'
-                    }}
+                    style={{ width: '100%' }}
                     className="phone-input-custom"
                   />
                   {phoneError && (
@@ -749,7 +733,7 @@ const BankAnalyzerLanding: React.FC = () => {
                   padding: '1rem',
                   fontSize: '1rem',
                   fontWeight: 600,
-                  background: isSubmitting ? '#9ca3af' : 'linear-gradient(135deg, #e5b45f 0%, #d4a04a 100%)',
+                  background: isSubmitting ? '#9ca3af' : '#e5b45f',
                   color: 'white',
                   border: 'none',
                   borderRadius: '0.5rem',
@@ -806,13 +790,12 @@ const BankAnalyzerLanding: React.FC = () => {
             to { transform: rotate(360deg); }
           }
           
-          /* Estilos personalizados para PhoneInput */
           .phone-input-custom .PhoneInputInput {
             width: 100%;
             padding: 0.875rem 1rem;
             border: 2px solid #e5e7eb;
             border-radius: 0.5rem;
-            fontSize: 1rem;
+            font-size: 1rem;
             outline: none;
             box-sizing: border-box;
           }
@@ -844,6 +827,7 @@ const BankAnalyzerLanding: React.FC = () => {
     );
   }
 
+  // PANTALLA DE LOGIN
   return (
     <div style={{
       minHeight: '100vh',
@@ -917,7 +901,7 @@ const BankAnalyzerLanding: React.FC = () => {
               <input
                 type="email"
                 value={loginData.email}
-                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLoginData({ ...loginData, email: e.target.value })}
                 placeholder="tu@email.com"
                 style={{
                   width: '100%',
@@ -954,7 +938,7 @@ const BankAnalyzerLanding: React.FC = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={loginData.password}
-                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLoginData({ ...loginData, password: e.target.value })}
                 placeholder="••••••••"
                 style={{
                   width: '100%',
@@ -994,7 +978,7 @@ const BankAnalyzerLanding: React.FC = () => {
               padding: '1rem',
               fontSize: '1rem',
               fontWeight: 600,
-              background: isSubmitting ? '#9ca3af' : 'linear-gradient(135deg, #e5b45f 0%, #d4a04a 100%)',
+              background: isSubmitting ? '#9ca3af' : '#e5b45f',
               color: 'white',
               border: 'none',
               borderRadius: '0.5rem',
