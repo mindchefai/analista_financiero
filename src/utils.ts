@@ -1,6 +1,10 @@
-// utils.ts
+// utils.ts - VERSION FINAL
+
 import { CATEGORIA_RULES } from './constants';
 
+/**
+ * Formatea un número como moneda en euros
+ */
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('es-ES', {
     style: 'currency',
@@ -8,6 +12,9 @@ export const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
+/**
+ * Muestra un mensaje de error
+ */
 export const showError = (title: string, message: string) => {
   const errorDiv = document.createElement('div');
   errorDiv.style.cssText = `
@@ -44,29 +51,48 @@ export const showError = (title: string, message: string) => {
   document.body.appendChild(errorDiv);
 };
 
-export const autoCategorize = (concepto: string, importe: number): string | null => {
-  if (importe > 0) {
-    for (const pattern of CATEGORIA_RULES.venta) {
-      if (pattern.test(concepto)) {
-        return 'venta';
-      }
-    }
-    return 'venta';
-  }
-
-  for (const [categoria, patterns] of Object.entries(CATEGORIA_RULES)) {
-    if (categoria === 'venta') continue;
+/**
+ * CORRECCIÓN DE ENCODING
+ * Corrige caracteres mal codificados en archivos CSV
+ */
+export const fixEncoding = (text: string): string => {
+  if (!text) return text;
+  
+  const encodingFixes: Record<string, string> = {
+    // Caracteres diamante y símbolos mal codificados
+    '\u25C6': '', // ◆
+    '\uFFFD': '', // �
     
-    for (const pattern of patterns) {
-      if (pattern.test(concepto)) {
-        return categoria;
-      }
-    }
-  }
+    // Patrones específicos que aparecen en los datos
+    'd\u25C6a': 'dia',
+    'd\u25C6as': 'dias',
+    'tel\u25C6fono': 'telefono',
+    'informaci\u25C6n': 'informacion',
+    'distribuci\u25C6n': 'distribucion',
+    'panader\u25C6a': 'panaderia',
+    'carnicer\u25C6a': 'carniceria',
+    'pescader\u25C6a': 'pescaderia',
+    'alimentaci\u25C6n': 'alimentacion',
+    'n\u25C6mina': 'nomina',
+    'cotizaci\u25C6n': 'cotizacion',
+    'reparaci\u25C6n': 'reparacion',
+    'suscripci\u25C6n': 'suscripcion',
+    'gestor\u25C6a': 'gestoria',
+  };
 
-  return null;
+  let fixed = text;
+  
+  // Aplicar todas las correcciones
+  for (const [wrong, correct] of Object.entries(encodingFixes)) {
+    fixed = fixed.replace(new RegExp(wrong, 'g'), correct);
+  }
+  
+  return fixed;
 };
 
+/**
+ * Parsea un string de importe a número
+ */
 export const parseImporte = (importeStr: string): number => {
   // Eliminar símbolos de moneda y espacios
   importeStr = importeStr.replace(/[€$£]/g, '').replace(/\s/g, '');
@@ -103,4 +129,81 @@ export const parseImporte = (importeStr: string): number => {
   }
   
   return parseFloat(importeStr) || 0;
+};
+
+/**
+ * AUTO-CATEGORIZACIÓN MEJORADA
+ * Categoriza automáticamente basándose en el concepto y el importe
+ */
+export const autoCategorize = (concepto: string, importe: number): string | null => {
+  if (!concepto || concepto.trim() === '') return null;
+
+  // 1. CORREGIR ENCODING primero
+  const conceptoCorregido = fixEncoding(concepto);
+  
+  // 2. NORMALIZAR para búsqueda (minúsculas)
+  const conceptoLower = conceptoCorregido.toLowerCase();
+
+  // 3. REGLA ESPECIAL: Ventas (importes positivos)
+  if (importe > 0) {
+    // Buscar patrones de venta
+    for (const pattern of CATEGORIA_RULES.venta) {
+      if (pattern.test(conceptoLower)) {
+        return 'venta';
+      }
+    }
+    // Si es positivo y no encontró patrón específico, asumir que es venta
+    return 'venta';
+  }
+
+  // 4. CATEGORÍAS PARA GASTOS (importes negativos)
+  
+  // Orden de prioridad para evitar conflictos
+  const categoriasOrdenadas: Array<keyof typeof CATEGORIA_RULES> = [
+    'personal',    // Tiene prioridad (nóminas, SS)
+    'materia',     // Segunda prioridad (proveedores)
+    'gastos',      // Tercera prioridad (más genérica)
+    'otros',       // Última opción
+  ];
+
+  // Buscar coincidencias en orden de prioridad
+  for (const categoria of categoriasOrdenadas) {
+    const patterns = CATEGORIA_RULES[categoria];
+    if (!patterns) continue;
+    
+    for (const pattern of patterns) {
+      if (pattern.test(conceptoLower)) {
+        return categoria;
+      }
+    }
+  }
+
+  // 5. No se pudo categorizar automáticamente
+  return null;
+};
+
+/**
+ * Obtiene estadísticas de categorización
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getCategorizeStats = (transactions: any[]): {
+  total: number;
+  categorized: number;
+  autoCategorized: number;
+  percentageAuto: number;
+  percentageTotal: number;
+} => {
+  const total = transactions.length;
+  const categorized = transactions.filter(t => t.categoria).length;
+  const autoCategorized = transactions.filter(t => t.autoCategoria).length;
+  const percentageAuto = total > 0 ? Math.round((autoCategorized / total) * 100) : 0;
+  const percentageTotal = total > 0 ? Math.round((categorized / total) * 100) : 0;
+
+  return { 
+    total, 
+    categorized, 
+    autoCategorized, 
+    percentageAuto,
+    percentageTotal 
+  };
 };

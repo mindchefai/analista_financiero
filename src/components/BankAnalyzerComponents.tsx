@@ -10,7 +10,7 @@ export { AutoCategorizeBanner } from './AutoCategorizeBanner';
 export { TransactionRow } from './TransactionRow';
 export { CompactKPI } from './CompactKPI';
 export { PieChart } from './PieChart';
-export { BarChart } from './BarChart';
+export { LineChart } from './LineChart';
 export { DataView } from './DataView';
 export { ResultsView } from './ResultsView';
 

@@ -4,7 +4,7 @@ import { TrendingUp, TrendingDown, PieChart as PieChartIcon, EuroIcon } from 'lu
 import { Stats, DailySales } from '../types/types';
 import { CompactKPI } from './CompactKPI';
 import { DashboardTitle } from './BankAnalyzerStyled';
-import { PieChart, BarChart } from './BankAnalyzerComponents';
+import { PieChart, LineChart } from './BankAnalyzerComponents';
 
 interface ResultsViewProps {
   stats: Stats;
@@ -63,7 +63,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         gap: '1.25rem'
       }}>
         <PieChart stats={stats} formatCurrency={formatCurrency} />
-        <BarChart data={dailySales} formatCurrency={formatCurrency} />
+        <LineChart data={dailySales} formatCurrency={formatCurrency} />
       </div>
     </div>
   );

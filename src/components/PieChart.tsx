@@ -10,13 +10,21 @@ interface PieChartProps {
 export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => {
   const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
   
-  const total = stats.gastosGenerales + stats.personal + stats.materiaPrima + stats.otrosGastos;
-  const gastosPercent = stats.ratios.gastosVentas;
-  const personalPercent = stats.ratios.personalVentas;
-  const materiaPercent = stats.ratios.materiaVentas;
-  const otrosPercent = stats.ratios.otrosVentas;
+  const totalCostes = stats.gastosGenerales + stats.personal + stats.materiaPrima + stats.otrosGastos;
+  
+  // Porcentajes sobre VENTAS (para mostrar en la UI) - con 1 decimal
+  const gastosPercentVentas = stats.ventas > 0 ? ((stats.gastosGenerales / stats.ventas) * 100).toFixed(1) : '0.0';
+  const personalPercentVentas = stats.ventas > 0 ? ((stats.personal / stats.ventas) * 100).toFixed(1) : '0.0';
+  const materiaPercentVentas = stats.ventas > 0 ? ((stats.materiaPrima / stats.ventas) * 100).toFixed(1) : '0.0';
+  const otrosPercentVentas = stats.ventas > 0 ? ((stats.otrosGastos / stats.ventas) * 100).toFixed(1) : '0.0';
+  
+  // Porcentajes sobre COSTES TOTALES (para el gráfico circular - proporcional)
+  const gastosPercentGrafico = totalCostes > 0 ? (stats.gastosGenerales / totalCostes) * 100 : 0;
+  const personalPercentGrafico = totalCostes > 0 ? (stats.personal / totalCostes) * 100 : 0;
+  const materiaPercentGrafico = totalCostes > 0 ? (stats.materiaPrima / totalCostes) * 100 : 0;
+  const otrosPercentGrafico = totalCostes > 0 ? (stats.otrosGastos / totalCostes) * 100 : 0;
 
-  if (total === 0) {
+  if (totalCostes === 0) {
     return (
       <div style={{ 
         border: '1px solid #e5e7eb',
@@ -39,7 +47,7 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
       label: 'Gastos Generales', 
       color: '#dc2626', 
       value: stats.gastosGenerales, 
-      percent: gastosPercent, 
+      percentVentas: gastosPercentVentas, 
       key: 'gastos', 
       bg: '#fef2f2' 
     },
@@ -47,7 +55,7 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
       label: 'Personal', 
       color: '#f97316', 
       value: stats.personal, 
-      percent: personalPercent, 
+      percentVentas: personalPercentVentas, 
       key: 'personal', 
       bg: '#fff7ed' 
     },
@@ -55,7 +63,7 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
       label: 'Materia Prima', 
       color: '#ec4899', 
       value: stats.materiaPrima, 
-      percent: materiaPercent, 
+      percentVentas: materiaPercentVentas, 
       key: 'materia', 
       bg: '#fdf2f8' 
     },
@@ -63,7 +71,7 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
       label: 'Otros Gastos', 
       color: '#8b5cf6', 
       value: stats.otrosGastos, 
-      percent: otrosPercent, 
+      percentVentas: otrosPercentVentas, 
       key: 'otros', 
       bg: '#faf5ff' 
     }
@@ -93,7 +101,7 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
           <circle
             cx="100" cy="100" r="80"
             fill="transparent" stroke="#dc2626" strokeWidth="40"
-            strokeDasharray={`${(gastosPercent / 100) * 502.65} 502.65`}
+            strokeDasharray={`${(gastosPercentGrafico / 100) * 502.65} 502.65`}
             transform="rotate(-90 100 100)"
             style={{ 
               cursor: 'pointer',
@@ -107,8 +115,8 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
           <circle
             cx="100" cy="100" r="80"
             fill="transparent" stroke="#f97316" strokeWidth="40"
-            strokeDasharray={`${(personalPercent / 100) * 502.65} 502.65`}
-            strokeDashoffset={-((gastosPercent / 100) * 502.65)}
+            strokeDasharray={`${(personalPercentGrafico / 100) * 502.65} 502.65`}
+            strokeDashoffset={-((gastosPercentGrafico / 100) * 502.65)}
             transform="rotate(-90 100 100)"
             style={{ 
               cursor: 'pointer',
@@ -122,8 +130,8 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
           <circle
             cx="100" cy="100" r="80"
             fill="transparent" stroke="#ec4899" strokeWidth="40"
-            strokeDasharray={`${(materiaPercent / 100) * 502.65} 502.65`}
-            strokeDashoffset={-(((gastosPercent + personalPercent) / 100) * 502.65)}
+            strokeDasharray={`${(materiaPercentGrafico / 100) * 502.65} 502.65`}
+            strokeDashoffset={-(((gastosPercentGrafico + personalPercentGrafico) / 100) * 502.65)}
             transform="rotate(-90 100 100)"
             style={{ 
               cursor: 'pointer',
@@ -137,8 +145,8 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
           <circle
             cx="100" cy="100" r="80"
             fill="transparent" stroke="#8b5cf6" strokeWidth="40"
-            strokeDasharray={`${(otrosPercent / 100) * 502.65} 502.65`}
-            strokeDashoffset={-(((gastosPercent + personalPercent + materiaPercent) / 100) * 502.65)}
+            strokeDasharray={`${(otrosPercentGrafico / 100) * 502.65} 502.65`}
+            strokeDashoffset={-(((gastosPercentGrafico + personalPercentGrafico + materiaPercentGrafico) / 100) * 502.65)}
             transform="rotate(-90 100 100)"
             style={{ 
               cursor: 'pointer',
@@ -151,10 +159,10 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
           {/* Centro blanco con texto */}
           <circle cx="100" cy="100" r="60" fill="white" />
           <text x="100" y="92" textAnchor="middle" style={{ fontSize: '10px', fill: '#6b7280', fontWeight: 500 }}>
-            Total
+            Total Costes
           </text>
           <text x="100" y="108" textAnchor="middle" style={{ fontSize: '13px', fill: '#111827', fontWeight: 700 }}>
-            {formatCurrency(total)}
+            {formatCurrency(totalCostes)}
           </text>
         </svg>
       </div>
@@ -187,7 +195,7 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
                 {formatCurrency(item.value)}
               </span>
               <span style={{ fontSize: '0.7rem', color: '#6b7280', marginLeft: '0.375rem' }}>
-                ({item.percent}%)
+                ({item.percentVentas}%)
               </span>
             </div>
           </div>
