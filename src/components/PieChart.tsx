@@ -10,21 +10,14 @@ interface PieChartProps {
 export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => {
   const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
   
-  const totalCostes = stats.gastosGenerales + stats.personal + stats.materiaPrima + stats.otrosGastos;
-  
-  // Porcentajes sobre VENTAS (para mostrar en la UI) - con 1 decimal
-  const gastosPercentVentas = stats.ventas > 0 ? ((stats.gastosGenerales / stats.ventas) * 100).toFixed(1) : '0.0';
-  const personalPercentVentas = stats.ventas > 0 ? ((stats.personal / stats.ventas) * 100).toFixed(1) : '0.0';
-  const materiaPercentVentas = stats.ventas > 0 ? ((stats.materiaPrima / stats.ventas) * 100).toFixed(1) : '0.0';
-  const otrosPercentVentas = stats.ventas > 0 ? ((stats.otrosGastos / stats.ventas) * 100).toFixed(1) : '0.0';
-  
-  // Porcentajes sobre COSTES TOTALES (para el gráfico circular - proporcional)
-  const gastosPercentGrafico = totalCostes > 0 ? (stats.gastosGenerales / totalCostes) * 100 : 0;
-  const personalPercentGrafico = totalCostes > 0 ? (stats.personal / totalCostes) * 100 : 0;
-  const materiaPercentGrafico = totalCostes > 0 ? (stats.materiaPrima / totalCostes) * 100 : 0;
-  const otrosPercentGrafico = totalCostes > 0 ? (stats.otrosGastos / totalCostes) * 100 : 0;
+  // Porcentajes sobre VENTAS (para el gráfico)
+  const gastosPercentVentas = stats.ventas > 0 ? (stats.gastosGenerales / stats.ventas) * 100 : 0;
+  const personalPercentVentas = stats.ventas > 0 ? (stats.personal / stats.ventas) * 100 : 0;
+  const materiaPercentVentas = stats.ventas > 0 ? (stats.materiaPrima / stats.ventas) * 100 : 0;
+  const otrosPercentVentas = stats.ventas > 0 ? (stats.otrosGastos / stats.ventas) * 100 : 0;
+  const beneficioPercentVentas = stats.ventas > 0 ? (stats.beneficio / stats.ventas) * 100 : 0;
 
-  if (totalCostes === 0) {
+  if (stats.ventas === 0) {
     return (
       <div style={{ 
         border: '1px solid #e5e7eb',
@@ -37,45 +30,56 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
         justifyContent: 'center',
         color: '#9ca3af'
       }}>
-        No hay datos de costes
+        No hay datos de ventas
       </div>
     );
   }
 
   const legendItems = [
     { 
-      label: 'Gastos Generales', 
-      color: '#dc2626', 
-      value: stats.gastosGenerales, 
-      percentVentas: gastosPercentVentas, 
-      key: 'gastos', 
+      label: 'Materia Prima', 
+      color: '#7c2d12', // Marrón oscuro
+      value: stats.materiaPrima, 
+      percentVentas: materiaPercentVentas, 
+      key: 'materia', 
       bg: '#fef2f2' 
     },
     { 
       label: 'Personal', 
-      color: '#f97316', 
+      color: '#991b1b', // Rojo oscuro
       value: stats.personal, 
       percentVentas: personalPercentVentas, 
       key: 'personal', 
-      bg: '#fff7ed' 
+      bg: '#fee2e2' 
     },
     { 
-      label: 'Materia Prima', 
-      color: '#ec4899', 
-      value: stats.materiaPrima, 
-      percentVentas: materiaPercentVentas, 
-      key: 'materia', 
-      bg: '#fdf2f8' 
+      label: 'Gastos Generales', 
+      color: '#dc2626', // Rojo medio
+      value: stats.gastosGenerales, 
+      percentVentas: gastosPercentVentas, 
+      key: 'gastos', 
+      bg: '#fecaca' 
     },
     { 
       label: 'Otros Gastos', 
-      color: '#8b5cf6', 
+      color: '#f87171', // Rojo claro
       value: stats.otrosGastos, 
       percentVentas: otrosPercentVentas, 
       key: 'otros', 
-      bg: '#faf5ff' 
+      bg: '#fee2e2' 
+    },
+    { 
+      label: 'Beneficio', 
+      color: stats.beneficio >= 0 ? '#10b981' : '#ef4444', // Verde si positivo, rojo si negativo
+      value: stats.beneficio, 
+      percentVentas: beneficioPercentVentas, 
+      key: 'beneficio', 
+      bg: stats.beneficio >= 0 ? '#d1fae5' : '#fee2e2'
     }
   ];
+
+  // Calcular offsets acumulativos
+  let accumulatedOffset = 0;
 
   return (
     <div style={{ 
@@ -92,77 +96,45 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
         color: '#203c42',
         margin: '0 0 1rem 0'
       }}>
-        Estructura de Costes
+        Distribución sobre Ventas
       </h4>
       
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
         <svg width="140" height="140" viewBox="0 0 200 200">
-          {/* Gastos Generales */}
-          <circle
-            cx="100" cy="100" r="80"
-            fill="transparent" stroke="#dc2626" strokeWidth="40"
-            strokeDasharray={`${(gastosPercentGrafico / 100) * 502.65} 502.65`}
-            transform="rotate(-90 100 100)"
-            style={{ 
-              cursor: 'pointer',
-              opacity: hoveredSegment === 'gastos' || !hoveredSegment ? 1 : 0.5,
-              transition: 'opacity 0.2s ease'
-            }}
-            onMouseEnter={() => setHoveredSegment('gastos')}
-            onMouseLeave={() => setHoveredSegment(null)}
-          />
-          {/* Personal */}
-          <circle
-            cx="100" cy="100" r="80"
-            fill="transparent" stroke="#f97316" strokeWidth="40"
-            strokeDasharray={`${(personalPercentGrafico / 100) * 502.65} 502.65`}
-            strokeDashoffset={-((gastosPercentGrafico / 100) * 502.65)}
-            transform="rotate(-90 100 100)"
-            style={{ 
-              cursor: 'pointer',
-              opacity: hoveredSegment === 'personal' || !hoveredSegment ? 1 : 0.5,
-              transition: 'opacity 0.2s ease'
-            }}
-            onMouseEnter={() => setHoveredSegment('personal')}
-            onMouseLeave={() => setHoveredSegment(null)}
-          />
-          {/* Materia Prima */}
-          <circle
-            cx="100" cy="100" r="80"
-            fill="transparent" stroke="#ec4899" strokeWidth="40"
-            strokeDasharray={`${(materiaPercentGrafico / 100) * 502.65} 502.65`}
-            strokeDashoffset={-(((gastosPercentGrafico + personalPercentGrafico) / 100) * 502.65)}
-            transform="rotate(-90 100 100)"
-            style={{ 
-              cursor: 'pointer',
-              opacity: hoveredSegment === 'materia' || !hoveredSegment ? 1 : 0.5,
-              transition: 'opacity 0.2s ease'
-            }}
-            onMouseEnter={() => setHoveredSegment('materia')}
-            onMouseLeave={() => setHoveredSegment(null)}
-          />
-          {/* Otros Gastos */}
-          <circle
-            cx="100" cy="100" r="80"
-            fill="transparent" stroke="#8b5cf6" strokeWidth="40"
-            strokeDasharray={`${(otrosPercentGrafico / 100) * 502.65} 502.65`}
-            strokeDashoffset={-(((gastosPercentGrafico + personalPercentGrafico + materiaPercentGrafico) / 100) * 502.65)}
-            transform="rotate(-90 100 100)"
-            style={{ 
-              cursor: 'pointer',
-              opacity: hoveredSegment === 'otros' || !hoveredSegment ? 1 : 0.5,
-              transition: 'opacity 0.2s ease'
-            }}
-            onMouseEnter={() => setHoveredSegment('otros')}
-            onMouseLeave={() => setHoveredSegment(null)}
-          />
+          {legendItems.map((item) => {
+            const circumference = 502.65;
+            const segmentLength = (item.percentVentas / 100) * circumference;
+            const offset = -(accumulatedOffset / 100) * circumference;
+            accumulatedOffset += item.percentVentas;
+
+            return (
+              <circle
+                key={item.key}
+                cx="100" cy="100" r="80"
+                fill="transparent" 
+                stroke={item.color} 
+                strokeWidth="40"
+                strokeDasharray={`${segmentLength} ${circumference}`}
+                strokeDashoffset={offset}
+                transform="rotate(-90 100 100)"
+                style={{ 
+                  cursor: 'pointer',
+                  opacity: hoveredSegment === item.key || !hoveredSegment ? 1 : 0.5,
+                  transition: 'opacity 0.2s ease'
+                }}
+                onMouseEnter={() => setHoveredSegment(item.key)}
+                onMouseLeave={() => setHoveredSegment(null)}
+              />
+            );
+          })}
+          
           {/* Centro blanco con texto */}
           <circle cx="100" cy="100" r="60" fill="white" />
           <text x="100" y="92" textAnchor="middle" style={{ fontSize: '10px', fill: '#6b7280', fontWeight: 500 }}>
-            Total Costes
+            Total Ventas
           </text>
           <text x="100" y="108" textAnchor="middle" style={{ fontSize: '13px', fill: '#111827', fontWeight: 700 }}>
-            {formatCurrency(totalCostes)}
+            {formatCurrency(stats.ventas)}
           </text>
         </svg>
       </div>
@@ -195,7 +167,7 @@ export const PieChart: React.FC<PieChartProps> = ({ stats, formatCurrency }) => 
                 {formatCurrency(item.value)}
               </span>
               <span style={{ fontSize: '0.7rem', color: '#6b7280', marginLeft: '0.375rem' }}>
-                ({item.percentVentas}%)
+                ({item.percentVentas.toFixed(1)}%)
               </span>
             </div>
           </div>
