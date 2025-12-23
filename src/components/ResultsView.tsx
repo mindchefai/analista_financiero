@@ -1,10 +1,11 @@
 // components/ResultsView.tsx
-import React from 'react';
-import { TrendingUp, TrendingDown, PieChart as PieChartIcon, EuroIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { TrendingUp, TrendingDown, PieChart as PieChartIcon, EuroIcon, Sparkles } from 'lucide-react';
 import { Stats, DailySales } from '../types/types';
 import { CompactKPI } from './CompactKPI';
 import { DashboardTitle } from './BankAnalyzerStyled';
 import { PieChart, LineChart } from './BankAnalyzerComponents';
+import { AIAnalysis } from './AIAnalysis';
 
 interface ResultsViewProps {
   stats: Stats;
@@ -17,6 +18,8 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
   dailySales, 
   formatCurrency 
 }) => {
+  const [showAnalysis, setShowAnalysis] = useState(false);
+
   return (
     <div>
       <DashboardTitle>Dashboard Financiero</DashboardTitle>
@@ -60,11 +63,70 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
-        gap: '1.25rem'
+        gap: '1.25rem',
+        marginBottom: '1.5rem'
       }}>
         <PieChart stats={stats} formatCurrency={formatCurrency} />
         <LineChart data={dailySales} formatCurrency={formatCurrency} />
       </div>
+
+      {/* Botón de Análisis con IA */}
+      {!showAnalysis && (
+        <div style={{ 
+          marginTop: '2rem',
+          textAlign: 'center'
+        }}>
+          <button
+            onClick={() => setShowAnalysis(true)}
+            style={{
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '1rem 2rem',
+              fontSize: '1rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              boxShadow: '0 4px 6px rgba(99, 102, 241, 0.25)',
+              transition: 'all 0.3s ease',
+              transform: 'translateY(0)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 12px rgba(99, 102, 241, 0.35)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 6px rgba(99, 102, 241, 0.25)';
+            }}
+          >
+            <Sparkles size={20} />
+            Analizar con IA
+          </button>
+          <p style={{ 
+            fontSize: '0.875rem', 
+            color: '#6b7280', 
+            marginTop: '0.75rem',
+            fontStyle: 'italic'
+          }}>
+            Obtén recomendaciones personalizadas para mejorar tu rentabilidad
+          </p>
+        </div>
+      )}
+
+      {/* Componente de Análisis con IA - Al final */}
+      {showAnalysis && (
+        <div style={{ marginTop: '2rem' }}>
+          <AIAnalysis 
+            stats={stats} 
+            formatCurrency={formatCurrency}
+            onClose={() => setShowAnalysis(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };
