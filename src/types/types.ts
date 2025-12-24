@@ -31,3 +31,27 @@ export interface DailySales {
 }
 
 export type TabType = 'datos' | 'resultados';
+
+// ✨ NUEVA INTERFAZ
+export interface AnalysisResponse {
+  resumenGeneral: string;
+  puntosClave: string[];
+  alertas: {
+    tipo: 'warning' | 'danger' | 'info';
+    titulo: string;
+    descripcion: string;
+  }[];
+  recomendaciones: {
+    categoria: string;
+    titulo: string;
+    descripcion: string;
+    impactoEstimado: string;
+    prioridad: 'alta' | 'media' | 'baja';
+  }[];
+  metricasObjetivo: {
+    metrica: string;
+    valorActual: string;
+    valorObjetivo: string;
+    gap: string;
+  }[];
+}

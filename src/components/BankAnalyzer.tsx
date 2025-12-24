@@ -1,7 +1,7 @@
 // BankAnalyzer.tsx (REFACTORIZADO)
 import React, { useState, useEffect } from 'react';
 import { Upload, PieChart as PieChartIcon } from 'lucide-react';
-import { TabType } from '../types/types';
+import { TabType , AnalysisResponse  } from '../types/types';
 import { formatCurrency } from '../utils';
 import { useCSVParser } from '../hooks/useCSVParser';
 import { useStats } from '../hooks/useStats';
@@ -23,7 +23,9 @@ const BankAnalyzer: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('datos');
   const [validated, setValidated] = useState<boolean>(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState<boolean>(false);
-const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
+  const [analysisUsed, setAnalysisUsed] = useState(false);
+const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
 
   const { transactions, setTransactions, parseCSV } = useCSVParser();
   const { stats, dailySales } = useStats(transactions, validated);
@@ -46,6 +48,8 @@ const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
           const text = event.target.result as string;
           parseCSV(text);
           setValidated(false);
+          setAnalysisUsed(false); // ✨ RESETEAR análisis al subir nuevo archivo
+          setAnalysisResult(null); // ✨ RESETEAR resultado también
         }
       };
       reader.readAsText(file);
@@ -58,10 +62,9 @@ const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
     );
   };
 
-const handleAutoCategorize = () => {
-  setIsPremiumModalOpen(true);
-};
-
+  const handleAutoCategorize = () => {
+    setIsPremiumModalOpen(true);
+  };
 
   const handleValidate = () => {
     const allCategorized = transactions.every(t => t.categoria);
@@ -137,15 +140,18 @@ const handleAutoCategorize = () => {
                 stats={stats}
                 dailySales={dailySales}
                 formatCurrency={formatCurrency}
+                analysisUsed={analysisUsed}
+                onAnalysisUsed={() => setAnalysisUsed(true)}
+                analysisResult={analysisResult} // ✨ PASAR resultado guardado
+                onAnalysisComplete={(result) => setAnalysisResult(result)} // ✨ GUARDAR resultado
               />
             )}
           </ContentArea>
         </ContentWrapper>
         <PremiumAutoCategorizeModal
-  isOpen={isPremiumModalOpen}
-  onClose={() => setIsPremiumModalOpen(false)}
-/>
-
+          isOpen={isPremiumModalOpen}
+          onClose={() => setIsPremiumModalOpen(false)}
+        />
       </Container>
     </>
   );

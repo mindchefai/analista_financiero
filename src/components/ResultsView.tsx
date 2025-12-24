@@ -1,7 +1,7 @@
 // components/ResultsView.tsx
 import React, { useState } from 'react';
 import { TrendingUp, TrendingDown, PieChart as PieChartIcon, EuroIcon, Sparkles } from 'lucide-react';
-import { Stats, DailySales } from '../types/types';
+import { Stats, DailySales , AnalysisResponse } from '../types/types';
 import { CompactKPI } from './CompactKPI';
 import { DashboardTitle } from './BankAnalyzerStyled';
 import { PieChart, LineChart } from './BankAnalyzerComponents';
@@ -11,14 +11,27 @@ interface ResultsViewProps {
   stats: Stats;
   dailySales: DailySales[];
   formatCurrency: (amount: number) => string;
+  analysisUsed: boolean;
+  onAnalysisUsed: () => void;
+  analysisResult: AnalysisResponse | null;
+  onAnalysisComplete: (result: AnalysisResponse) => void;
 }
 
 export const ResultsView: React.FC<ResultsViewProps> = ({ 
   stats, 
   dailySales, 
-  formatCurrency 
+  formatCurrency,
+  analysisUsed,
+  onAnalysisUsed,
+  analysisResult, // ✨ NUEVO
+  onAnalysisComplete // ✨ NUEVO
 }) => {
   const [showAnalysis, setShowAnalysis] = useState(false);
+
+  const handleShowAnalysis = () => {
+    setShowAnalysis(true);
+    onAnalysisUsed();
+  };
 
   return (
     <div>
@@ -70,14 +83,14 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         <LineChart data={dailySales} formatCurrency={formatCurrency} />
       </div>
 
-      {/* Botón de Análisis con IA */}
-      {!showAnalysis && (
+      {/* Botón de Análisis con IA - Solo si NO se ha usado */}
+      {!showAnalysis && !analysisUsed && (
         <div style={{ 
           marginTop: '2rem',
           textAlign: 'center'
         }}>
           <button
-            onClick={() => setShowAnalysis(true)}
+            onClick={handleShowAnalysis}
             style={{
               background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               color: 'white',
@@ -117,13 +130,15 @@ export const ResultsView: React.FC<ResultsViewProps> = ({
         </div>
       )}
 
-      {/* Componente de Análisis con IA - Al final */}
-      {showAnalysis && (
+      {/* Componente de Análisis con IA - O muestra el componente nuevo O el resultado guardado */}
+      {(showAnalysis || analysisResult) && (
         <div style={{ marginTop: '2rem' }}>
           <AIAnalysis 
             stats={stats} 
             formatCurrency={formatCurrency}
             onClose={() => setShowAnalysis(false)}
+            savedResult={analysisResult} // ✨ PASAR resultado guardado
+            onAnalysisComplete={onAnalysisComplete} // ✨ PASAR callback
           />
         </div>
       )}

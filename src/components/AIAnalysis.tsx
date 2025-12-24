@@ -1,7 +1,6 @@
 // components/AIAnalysis.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Send, 
   Loader2, 
   AlertTriangle, 
   Lightbulb, 
@@ -12,41 +11,32 @@ import {
   XCircle,
   X
 } from 'lucide-react';
-import { Stats } from '../types/types';
+import { Stats , AnalysisResponse } from '../types/types';
 
 interface AIAnalysisProps {
   stats: Stats;
   formatCurrency: (amount: number) => string;
   onClose?: () => void;
+  savedResult?: AnalysisResponse | null;
+  onAnalysisComplete?: (result: AnalysisResponse) => void;
 }
 
-interface AnalysisResponse {
-  resumenGeneral: string;
-  puntosClave: string[];
-  alertas: {
-    tipo: 'warning' | 'danger' | 'info';
-    titulo: string;
-    descripcion: string;
-  }[];
-  recomendaciones: {
-    categoria: string;
-    titulo: string;
-    descripcion: string;
-    impactoEstimado: string;
-    prioridad: 'alta' | 'media' | 'baja';
-  }[];
-  metricasObjetivo: {
-    metrica: string;
-    valorActual: string;
-    valorObjetivo: string;
-    gap: string;
-  }[];
-}
-
-export const AIAnalysis: React.FC<AIAnalysisProps> = ({ stats, onClose }) => {
+export const AIAnalysis: React.FC<AIAnalysisProps> = ({ 
+  stats, 
+  onClose, 
+  savedResult, 
+  onAnalysisComplete 
+}) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResponse | null>(savedResult || null); // ✨ CAMBIO AQUÍ
   const [error, setError] = useState<string | null>(null);
+
+  // ✨ Solo ejecutar análisis si NO hay resultado guardado
+  useEffect(() => {
+    if (!savedResult) {
+      handleAnalyze();
+    }
+  }, []); // Mantener dependencias vacías está bien aquí
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true);
@@ -79,7 +69,6 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({ stats, onClose }) => {
         timestamp: new Date().toISOString()
       };
 
-      // TODO: Reemplaza esta URL con tu webhook de Make.com
       const WEBHOOK_URL = import.meta.env.VITE_MAKE_WEBHOOK_URL || 'https://hook.eu2.make.com/xhs0duaf2453z6xtbzv4i15s0us1y1yi';
       
       const response = await fetch(WEBHOOK_URL, {
@@ -96,6 +85,11 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({ stats, onClose }) => {
 
       const data = await response.json();
       setAnalysisResult(data);
+
+            // ✨ GUARDAR resultado en el padre
+      if (onAnalysisComplete) {
+        onAnalysisComplete(data);
+      }
 
     } catch (err) {
       console.error('Error al analizar:', err);
@@ -193,41 +187,6 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({ stats, onClose }) => {
         </p>
       </div>
 
-      {/* Botón de análisis inicial */}
-      {!analysisResult && !isAnalyzing && (
-        <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-          <button
-            onClick={handleAnalyze}
-            style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '12px',
-              padding: '1rem 2rem',
-              fontSize: '1.125rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              boxShadow: '0 4px 6px rgba(99, 102, 241, 0.25)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 6px 12px rgba(99, 102, 241, 0.35)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 6px rgba(99, 102, 241, 0.25)';
-            }}
-          >
-            <Send size={24} />
-            Iniciar Análisis
-          </button>
-        </div>
-      )}
-
       {/* Estado de carga */}
       {isAnalyzing && (
         <div style={{ 
@@ -266,7 +225,7 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({ stats, onClose }) => {
       )}
 
       {/* Error */}
-      {error && (
+      {error && !isAnalyzing && (
         <div style={{ 
           padding: '1rem',
           borderRadius: '8px',
@@ -278,7 +237,7 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({ stats, onClose }) => {
           marginBottom: '1rem'
         }}>
           <XCircle size={24} style={{ color: '#dc2626', flexShrink: 0 }} />
-          <div>
+          <div style={{ flex: 1 }}>
             <p style={{ 
               fontSize: '0.875rem', 
               color: '#dc2626',
@@ -288,11 +247,33 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({ stats, onClose }) => {
               {error}
             </p>
           </div>
+          <button
+            onClick={handleAnalyze}
+            style={{
+              background: '#dc2626',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              padding: '0.5rem 1rem',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'background 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#b91c1c';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#dc2626';
+            }}
+          >
+            Reintentar
+          </button>
         </div>
       )}
 
       {/* Resultados del análisis */}
-      {analysisResult && (
+      {analysisResult && !isAnalyzing && (
         <div style={{ 
           display: 'flex',
           flexDirection: 'column',
@@ -613,37 +594,6 @@ export const AIAnalysis: React.FC<AIAnalysisProps> = ({ stats, onClose }) => {
               </div>
             </div>
           )}
-
-          {/* Botón para nuevo análisis */}
-          <div style={{ textAlign: 'center', paddingTop: '1rem', borderTop: '1px solid #e5e7eb' }}>
-            <button
-              onClick={() => {
-                setAnalysisResult(null);
-                setError(null);
-              }}
-              style={{
-                background: 'transparent',
-                color: '#6366f1',
-                border: '2px solid #6366f1',
-                borderRadius: '8px',
-                padding: '0.75rem 1.5rem',
-                fontSize: '1rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#6366f1';
-                e.currentTarget.style.color = 'white';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = '#6366f1';
-              }}
-            >
-              Realizar Nuevo Análisis
-            </button>
-          </div>
         </div>
       )}
 
